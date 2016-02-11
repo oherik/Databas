@@ -1,10 +1,6 @@
 INSERT INTO Department
-VALUES('Informationsteknik', 'IT');
-
-INSERT INTO Department
-VALUES('Datateknik', 'D');
-
-INSERT INTO Department
+VALUES('Informationsteknik', 'IT'),
+VALUES('Datateknik', 'D').
 VALUES('Elektroteknik', 'E');
 
 INSERT INTO Course

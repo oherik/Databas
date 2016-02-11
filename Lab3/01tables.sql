@@ -1,5 +1,5 @@
 -- TODO Fiska constraints. Typ textfält ska inte vara tomma
-
+-- CONSTRAINT asdasdad CHECK(Attributet <> '')
 CREATE TABLE Department (
     Name TEXT NOT NULL,
     Abbreviation CHAR(4) NOT NULL,
