@@ -19,13 +19,13 @@ CREATE TABLE Course(
 	Code TEXT NOT NULL,
 	Credit FLOAT NOT NULL,
 	Name	TEXT NOT NULL,
-	Department	TEXT NOT NULL,
+	Department	CHAR(4) NOT NULL,
 	PRIMARY KEY(Code),
-	FOREIGN KEY(Department)	REFERENCES Department.Abbreviation
+	FOREIGN KEY(Department)	REFERENCES Department(Abbreviation)
 );
 
 CREATE TABLE RestrictedCourse(
-	Code  TEXT NOT NULL REFERENCES Course.Code,
+	Code  TEXT NOT NULL REFERENCES Course(Code),
 	MaxStudents INT NOT NULL,
 	PRIMARY KEY(Code)
 );
@@ -34,7 +34,7 @@ CREATE TABLE Branch(
 	Name TEXT NOT NULL,
 	Programme TEXT NOT NULL,
 	PRIMARY KEY(Name, Programme),
-	FOREIGN KEY(Programme) REFERENCES Programme.Name
+	FOREIGN KEY(Programme) REFERENCES Programme(Name)
  );
 
 CREATE TABLE Student(
@@ -42,23 +42,23 @@ CREATE TABLE Student(
 	Name TEXT NOT NULL,
 	Programme TEXT NOT NUll,
 	PRIMARY KEY(ID),
-	FOREIGN KEY(Programme) REFERENCES Programme.Name
+	FOREIGN KEY(Programme) REFERENCES Programme(Name)
 );
 
 CREATE TABLE Prerequisite(
 	Course TEXT NOT NULL,
 	RequiredCourse TEXT NOT NULL,
 	PRIMARY KEY(Course, RequiredCourse),
-	FOREIGN KEY(Course) REFERENCES Course.Code,
-	FOREIGN KEY(RequiredCourse) REFERENCES Course.Code
+	FOREIGN KEY(Course) REFERENCES Course(Code),
+	FOREIGN KEY(RequiredCourse) REFERENCES Course(Code)
 );
 
 CREATE TABLE RegisteredOn(
 	Student TEXT NOT NULL,
 	Course TEXT NOT NULL,
 	PRIMARY KEY(Student,Course),
-	FOREIGN KEY(Student) REFERENCES Student.ID,
-	FOREIGN KEY(Course) REFERENCES Course.Code
+	FOREIGN KEY(Student) REFERENCES Student(ID),
+	FOREIGN KEY(Course) REFERENCES Course(Code)
 );
 
 CREATE TABLE HasFinished(
@@ -66,24 +66,24 @@ CREATE TABLE HasFinished(
 	Course TEXT NOT NUll,
 	Grade CHAR(1) NOT NULL,
 	PRIMARY KEY(Student, Course),
-	FOREIGN KEY(Student) REFERENCES Student.ID,
-	FOREIGN KEY(Course) REFERENCES Course.Code
+	FOREIGN KEY(Student) REFERENCES Student(ID),
+	FOREIGN KEY(Course) REFERENCES Course(Code)
 );
 
 CREATE TABLE HostedBy(
 	Programme TEXT NOT NULL,
 	Department CHAR(4) NOT NULL,
 	PRIMARY KEY(Programme, Department),
-	FOREIGN KEY(Programme) REFERENCES Programme.Name,
-	FOREIGN KEy(Department) REFERENCES Department.Abbreviation
+	FOREIGN KEY(Programme) REFERENCES Programme(Name),
+	FOREIGN KEy(Department) REFERENCES Department(Abbreviation)
 );
 
 CREATE TABLE ProgrammeHasMandatory(
 	Programme TEXT NOT NULL,
 	Course TEXT NOT NULL,
 	PRIMARY KEY(Programme, Course),
-	FOREIGN KEY(Programme) REFERENCES Programme.Name,
-	FOREIGN KEY(Course) REFERENCES Course.Code
+	FOREIGN KEY(Programme) REFERENCES Programme(Name),
+	FOREIGN KEY(Course) REFERENCES Course(Code)
 );
 
 
@@ -92,8 +92,8 @@ CREATE TABLE BranchHasMandatory(
 	Programme TEXT NOT NULL,
 	Course TEXT NOT NULL,
 	PRIMARY KEY(Branch, Programme, Course),
-	FOREIGN KEY(Branch, Programme) REFERENCES Branch.(Name, Programme),
-	FOREIGN KEY(Course) REFERENCES Course.Code
+	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
+	FOREIGN KEY(Course) REFERENCES Course(Code)
 );
 
 
@@ -102,8 +102,8 @@ CREATE TABLE HasRecommended(
 	Programme TEXT NOT NULL,
 	Course TEXT NOT NULL,
 	PRIMARY KEY(Branch, Programme, Course),
-	FOREIGN KEY(Branch, Programme) REFERENCES Branch.(Name, Programme),
-	FOREIGN KEY(Course) REFERENCES Course.Code
+	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
+	FOREIGN KEY(Course) REFERENCES Course(Code)
 );
 
 CREATE TABLE StudiesBranch(
@@ -111,8 +111,8 @@ CREATE TABLE StudiesBranch(
 	Branch TEXT NOT NULL,
 	Programme TEXT NOT NULL,
 	PRIMARY KEY(Student, Branch, Programme),
-	FOREIGN KEY(Branch, Programme) REFERENCES Branch.(Name, Programme),
-	FOREIGN KEY(Student) REFERENCES Student.ID
+	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
+	FOREIGN KEY(Student) REFERENCES Student(ID)
 );
 
 
@@ -121,14 +121,14 @@ CREATE TABLE IsOnWaitingList(
 	RestrictedCourse TEXT NOT NULL,
 	DateRegistered DATE NOT NULL,
 	PRIMARY KEY(Student, RestrictedCourse),
-	FOREIGN KEY(RestrictedCourse) REFERENCES RestrictedCourse.Code,
-	FOREIGN KEY(Student) REFERENCES Student.ID
+	FOREIGN KEY(RestrictedCourse) REFERENCES RestrictedCourse(Code),
+	FOREIGN KEY(Student) REFERENCES Student(ID)
 );
 
 CREATE TABLE HasClassification(
 	Course TEXT NOT NULL,
 	Classification TEXT NOT NULL,
 	PRIMARY KEY(Course, Classification),
-	FOREIGN KEY(Course) REFERENCES Course.Code,
-	FOREIGN KEY(Classification) REFERENCES Classification.Name
+	FOREIGN KEY(Course) REFERENCES Course(Code),
+	FOREIGN KEY(Classification) REFERENCES Classification(Name)
 );
