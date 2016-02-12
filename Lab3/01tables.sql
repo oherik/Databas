@@ -1,46 +1,46 @@
 CREATE TABLE Department (
-    Name TEXT NOT NULL CONSTRAINT DepartmentNameNotEmpty CHECK(Name <> ''),
-	Abbreviation CHAR(4) NOT NULL CONSTRAINT AbbreviationNameNotEmpty CHECK(Abbreviation <> '    '),  -- Check for four empty spaces, since Abbreviation is a CHAR(4)
+    Name TEXT NOT NULL CONSTRAINT department_name_not_empty CHECK(Name <> ''),
+	Abbreviation CHAR(4) NOT NULL CONSTRAINT department_abbreviation_not_empty CHECK(Abbreviation <> '    '),  -- Check for four empty spaces, since Abbreviation is a CHAR(4)
     PRIMARY KEY(Abbreviation),
 	UNIQUE(Name)
 );
 
 CREATE TABLE Programme (
-	Name TEXT NOT NULL CONSTRAINT ProgrammeNameNotEmpty CHECK(Name <> ''),
-	Abbreviation CHAR(4) NOT NULL CONSTRAINT ProgrammeAbbreviationNotEmpty CHECK(Abbreviation <> '    '),  
+	Name TEXT NOT NULL CONSTRAINT programme_name_not_empty CHECK(Name <> ''),
+	Abbreviation CHAR(4) NOT NULL CONSTRAINT programme_abbreviation_not_empty CHECK(Abbreviation <> '    '),  
 	PRIMARY KEY(Name)
 );	
 
 CREATE TABLE Classification (
-	Name TEXT NOT NULL CONSTRAINT ClassificationNameNotEmpty CHECK(Name <> ''),
+	Name TEXT NOT NULL CONSTRAINT Classification_name_not_empty CHECK(Name <> ''),
 	PRIMARY KEY(Name)
 );
 
 CREATE TABLE Course(
-	Code TEXT NOT NULL CONSTRAINT CourseNameNotEmpty CHECK(Code <> ''),
-	Credit FLOAT NOT NULL CONSTRAINT CreditPositive CHECK(Credit > 0),
-	Name TEXT NOT NULL CONSTRAINT CourseNameNotEmty CHECK(Name <> ''),
-	Department CHAR(4) NOT NULL CONSTRAINT CourseDepartmentNotEmpty CHECK(Department <> '    '),
+	Code TEXT NOT NULL CONSTRAINT course_name_not_empty CHECK(Code <> ''),
+	Credit FLOAT NOT NULL CONSTRAINT course_credit_positive CHECK(Credit > 0),
+	Name TEXT NOT NULL CONSTRAINT course_name_not_empty CHECK(Name <> ''),
+	Department CHAR(4) NOT NULL CONSTRAINT course_department_not_empty CHECK(Department <> '    '),
 	PRIMARY KEY(Code),
 	FOREIGN KEY(Department)	REFERENCES Department(Abbreviation)
 );
 
 CREATE TABLE RestrictedCourse(
 	Code TEXT NOT NULL REFERENCES Course(Code),
-	MaxStudents INT NOT NULL CONSTRAINT RestrictedCourseMaxStudentsPositive CHECK(MaxStudents > 0),
+	MaxStudents INT NOT NULL CONSTRAINT restrictedcourse_maxstudents_positive CHECK(MaxStudents > 0),
 	PRIMARY KEY(Code)
 );
 
 CREATE TABLE Branch(
-	Name TEXT NOT NULL CONSTRAINT BranchNameNotEmpty CHECK(Name <> ''),
+	Name TEXT NOT NULL CONSTRAINT branch_name_not_empty CHECK(Name <> ''),
 	Programme TEXT NOT NULL,
 	PRIMARY KEY(Name, Programme),
 	FOREIGN KEY(Programme) REFERENCES Programme(Name)
  );
 
 CREATE TABLE Student(
-	ID TEXT NOT NULL CONSTRAINT StudentIDNotEmpty CHECK(ID <> ''),
-	Name TEXT NOT NULL CONSTRAINT StudentNameNotEmpty CHECK(Name <> ''),
+	ID TEXT NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> ''),
+	Name TEXT NOT NULL CONSTRAINT student_name_not_empty CHECK(Name <> ''),
 	Programme TEXT NOT NUll,
 	PRIMARY KEY(ID),
 	FOREIGN KEY(Programme) REFERENCES Programme(Name)
@@ -65,7 +65,7 @@ CREATE TABLE RegisteredOn(
 CREATE TABLE HasFinished(
 	Student TEXT NOT NULL,
 	Course TEXT NOT NUll,
-	Grade CHAR(1) NOT NULL CONSTRAINT HasFinishedValidGrade CHECK(Grade IN ('U','3','4','5')),
+	Grade CHAR(1) NOT NULL CONSTRAINT hasfinished_valid_grade CHECK(Grade IN ('U','3','4','5')),
 	PRIMARY KEY(Student, Course),
 	FOREIGN KEY(Student) REFERENCES Student(ID),
 	FOREIGN KEY(Course) REFERENCES Course(Code)
