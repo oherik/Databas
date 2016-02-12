@@ -21,8 +21,9 @@ INSERT INTO Programme
 --	Good values:
 VALUES
 	('Applied Information Technology', 'IT'),
-	('Computer Science', 'D'),
+	('Computer Science', 'CS'),
 	('Electronic Engineering', 'E'),
+	('Mechanical Engineering', 'M'),
 	('Technical Design', 'TD'),
 	('Liberal Arts', 'LA'),
 	('Juridics', 'J'),
@@ -95,5 +96,42 @@ VALUES
 
 
 
+
+
+INSERT INTO Branch
+VALUES
+-- Should throw errors:
+-- ('', 'Liberal Arts'),
+-- ('Hardware Engineering', ''),
+-- ('Hardware Engineering', 'IT'),
+-- ('Software Engineering', 'Computer Science'),
+-- Good values:
+('Software Engineering', 'Applied Information Technology'),
+('Graphical Experience', 'Applied Information Technology'),
+('Java and suchlike', 'Applied Information Technology'),
+('Algorithms', 'Computer Science'),
+('Low level programming', 'Computer Science'),
+('CPU construction', 'Electronic Engineering'),
+('Wire cutting', 'Electronic Engineering'),
+('Automotive', 'Mechanical Engineering'),
+('Aeronautic', 'Mechanical Engineering'),
+('Cortège', 'Mechanical Engineering'),
+('Production Design', 'Technical Design'),
+('User Interfaces', 'Technical Design'),
+('Music Theory', 'Liberal Arts'),
+('Rhetoric', 'Liberal Arts'),
+('History', 'Liberal Arts'),
+('Philosophy', 'Liberal Arts'),
+('Company Juridics', 'Juridics'),
+('Private Juridics', 'Juridics'),
+('International Law', 'Juridics'),
+('Copyright Law', 'Juridics'),
+('Nanorobotics', 'Nano-biotechnology'),
+('Osteon', 'Nano-biotechnology'),
+('Sanguis', 'Nano-biotechnology'),
+('Espionage', 'Political Science'),
+('International Relations', 'Political Science'),
+('Political Theory', 'Political Science')
+;
 
 
