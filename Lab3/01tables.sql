@@ -1,8 +1,8 @@
 -- TODO Fiska constraints. Typ textfält ska inte vara tomma
 -- CONSTRAINT asdasdad CHECK(Attributet <> '')
 CREATE TABLE Department (
-    Name TEXT NOT NULL,
-    Abbreviation CHAR(4) NOT NULL,
+    Name TEXT NOT NULL CONSTRAINT DepartmentNameNotEmpty CHECK(Name <> ''),
+    Abbreviation CHAR(4) NOT NULL CONSTRAINT AbbreviationNameNotEmpty CHECK(Abbreviation <> ''),
     PRIMARY KEY(Abbreviation)
 );
 
