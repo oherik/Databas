@@ -1,34 +1,33 @@
--- TODO Fiska constraints. Typ textfält ska inte vara tomma
--- CONSTRAINT asdasdad CHECK(Attributet <> '')
 CREATE TABLE Department (
     Name TEXT NOT NULL CONSTRAINT DepartmentNameNotEmpty CHECK(Name <> ''),
-    Abbreviation CHAR(4) NOT NULL CONSTRAINT AbbreviationNameNotEmpty CHECK(Abbreviation <> ''),
-    PRIMARY KEY(Abbreviation)
+	Abbreviation CHAR(4) NOT NULL CONSTRAINT AbbreviationNameNotEmpty CHECK(Abbreviation <> '    '),  -- Check for four emoty spaces, since Abbreviation is a CHAR(4)
+    PRIMARY KEY(Abbreviation),
+	UNIQUE(Name)
 );
 
 CREATE TABLE Programme (
-	Name TEXT NOT NULL,
-	Abbreviation CHAR(4) NOT NULL,
+	Name TEXT NOT NULL CONSTRAINT ProgrammeNameNotEmpty CHECK(Name <> ''),
+	Abbreviation CHAR(4) NOT NULL CONSTRAINT ProgrammeAbbreviationNotEmpty CHECK(Abbreviation <> '    '),  -- Check for four emoty spaces, since Abbreviation is a CHAR(4)
 	PRIMARY KEY(Name)
-);
+);	
 
 CREATE TABLE Classification (
-	Name TEXT NOT NULL,
+	Name TEXT NOT NULL CONSTRAINT ClassificationNameNotEmpty CHECK(Name <> ''),
 	PRIMARY KEY(Name)
 );
 
 CREATE TABLE Course(
-	Code TEXT NOT NULL,
-	Credit FLOAT NOT NULL,
-	Name	TEXT NOT NULL,
-	Department	CHAR(4) NOT NULL,
+	Code TEXT NOT NULL CONSTRAINT CourseNameNotEmpty CHECK(Code <> ‘’),
+	Credit FLOAT NOT NULL CONSTRAINT CreditPositive CHECK(Credit > 0),
+	Name TEXT NOT NULL CONSTRAINT CourseNameNotEmty CHECK(Name <> ‘’),
+	Department CHAR(4) NOT NULL,
 	PRIMARY KEY(Code),
 	FOREIGN KEY(Department)	REFERENCES Department(Abbreviation)
 );
 
 CREATE TABLE RestrictedCourse(
-	Code  TEXT NOT NULL REFERENCES Course(Code),
-	MaxStudents INT NOT NULL,
+	Code TEXT NOT NULL REFERENCES Course(Code),
+	MaxStudents INT NOT NULL CONSTRAINTS RestrictedCourseMaxStudentsPositive CHECK(MaxStudents > 0),
 	PRIMARY KEY(Code)
 );
 
