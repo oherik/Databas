@@ -17,9 +17,9 @@ CREATE TABLE Classification (
 );
 
 CREATE TABLE Course(
-	Code TEXT NOT NULL CONSTRAINT CourseNameNotEmpty CHECK(Code <> ‘’),
+	Code TEXT NOT NULL CONSTRAINT CourseNameNotEmpty CHECK(Code <> ''),
 	Credit FLOAT NOT NULL CONSTRAINT CreditPositive CHECK(Credit > 0),
-	Name TEXT NOT NULL CONSTRAINT CourseNameNotEmty CHECK(Name <> ‘’),
+	Name TEXT NOT NULL CONSTRAINT CourseNameNotEmty CHECK(Name <> ''),
 	Department CHAR(4) NOT NULL CONSTRAINT CourseDepartmentNotEmpty CHECK(Department <> '    '),
 	PRIMARY KEY(Code),
 	FOREIGN KEY(Department)	REFERENCES Department(Abbreviation)
