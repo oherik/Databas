@@ -1,13 +1,13 @@
 CREATE TABLE Department (
     Name TEXT NOT NULL CONSTRAINT DepartmentNameNotEmpty CHECK(Name <> ''),
-	Abbreviation CHAR(4) NOT NULL CONSTRAINT AbbreviationNameNotEmpty CHECK(Abbreviation <> '    '),  -- Check for four emoty spaces, since Abbreviation is a CHAR(4)
+	Abbreviation CHAR(4) NOT NULL CONSTRAINT AbbreviationNameNotEmpty CHECK(Abbreviation <> '    '),  -- Check for four empty spaces, since Abbreviation is a CHAR(4)
     PRIMARY KEY(Abbreviation),
 	UNIQUE(Name)
 );
 
 CREATE TABLE Programme (
 	Name TEXT NOT NULL CONSTRAINT ProgrammeNameNotEmpty CHECK(Name <> ''),
-	Abbreviation CHAR(4) NOT NULL CONSTRAINT ProgrammeAbbreviationNotEmpty CHECK(Abbreviation <> '    '),  -- Check for four emoty spaces, since Abbreviation is a CHAR(4)
+	Abbreviation CHAR(4) NOT NULL CONSTRAINT ProgrammeAbbreviationNotEmpty CHECK(Abbreviation <> '    '),  
 	PRIMARY KEY(Name)
 );	
 
@@ -20,27 +20,27 @@ CREATE TABLE Course(
 	Code TEXT NOT NULL CONSTRAINT CourseNameNotEmpty CHECK(Code <> ‘’),
 	Credit FLOAT NOT NULL CONSTRAINT CreditPositive CHECK(Credit > 0),
 	Name TEXT NOT NULL CONSTRAINT CourseNameNotEmty CHECK(Name <> ‘’),
-	Department CHAR(4) NOT NULL,
+	Department CHAR(4) NOT NULL CONSTRAINT CourseDepartmentNotEmpty CHECK(Department <> '    '),
 	PRIMARY KEY(Code),
 	FOREIGN KEY(Department)	REFERENCES Department(Abbreviation)
 );
 
 CREATE TABLE RestrictedCourse(
 	Code TEXT NOT NULL REFERENCES Course(Code),
-	MaxStudents INT NOT NULL CONSTRAINTS RestrictedCourseMaxStudentsPositive CHECK(MaxStudents > 0),
+	MaxStudents INT NOT NULL CONSTRAINT RestrictedCourseMaxStudentsPositive CHECK(MaxStudents > 0),
 	PRIMARY KEY(Code)
 );
 
 CREATE TABLE Branch(
-	Name TEXT NOT NULL,
+	Name TEXT NOT NULL CONSTRAINT BranchNameNotEmpty CHECK(Name <> ''),
 	Programme TEXT NOT NULL,
 	PRIMARY KEY(Name, Programme),
 	FOREIGN KEY(Programme) REFERENCES Programme(Name)
  );
 
 CREATE TABLE Student(
-	ID TEXT NOT NULL,
-	Name TEXT NOT NULL,
+	ID TEXT NOT NULL CONSTRAINT StudentIDNotEmpty CHECK(ID <> ''),
+	Name TEXT NOT NULL CONSTRAINT StudentNameNotEmpty CHECK(Name <> ''),
 	Programme TEXT NOT NUll,
 	PRIMARY KEY(ID),
 	FOREIGN KEY(Programme) REFERENCES Programme(Name)
@@ -65,7 +65,7 @@ CREATE TABLE RegisteredOn(
 CREATE TABLE HasFinished(
 	Student TEXT NOT NULL,
 	Course TEXT NOT NUll,
-	Grade CHAR(1) NOT NULL,
+	Grade CHAR(1) NOT NULL CONSTRAINT HasFinishedValidGrade CHECK(Grade IN ('U','3','4','5')),
 	PRIMARY KEY(Student, Course),
 	FOREIGN KEY(Student) REFERENCES Student(ID),
 	FOREIGN KEY(Course) REFERENCES Course(Code)
