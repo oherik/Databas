@@ -78,13 +78,13 @@ INSERT INTO RestrictedCourse
 VALUES
 -- Should not work
 -- ('Testtio', 23),
--- ('TDA357, 0'),
--- ('MVE343', wer'),
+-- ('TDA357, 0),
+-- ('MVE343', 'wer'),
 -- (23, 34),
 -- ('', ''),
--- (TDA357', ''),
+-- ('TDA357', ''),
 -- ('', 23'),
--- ('POL34', -1'),
+-- ('POL34', -1),
 -- Good values:
 ('TDA357', 24),
 ('TDA383', 35),
