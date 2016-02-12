@@ -29,6 +29,16 @@ VALUES
 	('Nano-biotechnology', 'NBT'),
 	('Political Science', 'PS')
 	;
+INSERT INTO Classification
+VALUES
+--Should not work:
+(''),
+(1.2),
+--Good values:
+('Mathematical'),
+('Research'),
+('Seminar')
+;
 
 INSERT INTO Course
 --	Should throw errors:
@@ -63,5 +73,27 @@ VALUES
 ('MED21', 5, 'Body Control', 'BMS'),
 ('LAW4444', 7.5, 'How to Become Judge, Jury and Executioner', 'HUM')
 ;
+INSERT INTO RestrictedCourse
+VALUES
+-- Should not work
+-- ('Testtio', 23),
+-- ('TDA357, 0'),
+-- ('MVE343', wer'),
+-- (23, 34),
+-- ('', ''),
+-- (TDA357', ''),
+-- ('', 23'),
+-- ('POL34', -1'),
+-- Good values:
+('TDA357', 24),
+('TDA383', 35),
+('LAW4444', 89),
+('MED21', 15),
+('TDA358', 46),
+('MDA2687', 87)
+;
+
+
+
 
 
