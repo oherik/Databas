@@ -10,15 +10,15 @@ The functional dependencies found:
 {studentNationalID, courseCode} -> {queuePos, grade}
 {studentSchoolID} -> {studentName, studentNationalID, studentCredit, branchName, programmeName, programmeAbbreviation}
 {studentSchoolID, courseCode} -> {queuePos, grade}
-{queuePos, queuePos, courseCode} -> {studentNationalID}
-{studentNationalID,studentNationalID, courseCode} -> {studentNationalID}
-(describing which student that is first in line)
+{queuePos, courseCode} -> {studentNationalID}
 
 Almost all of above are visible in our E-R diagram, except the following: 
 {departmentName} -> {departmentAbbreviation}. To solve this we have added the unique constraint to departmentName, and thus, if we have a departmentName we also get the key (departmentAbbreviation). 
 Since we get programmeName from studentNationalID, we add a referencing constraint to studies branch, to handle the cyclic relationship. 
 {studentSchoolID, courseCode} -> {queuePos, grade}
 {studentSchoolID} -> {studentName, studentNationalID, studentCredit, branchName, programmeName, programmeAbbreviation}, To solve this we have added the unique constraint to schoolID, therefor studentNationalID can be reached from studentSchoolID and everything else can be reached from studentNationalID. 
+{queuePos, courseCode} -> {studentNationalID}. Since only one student can have a certain queuePos for a course, we have added a unique constrain for (course, queuePos)
+
 {studentNationalID -> programmeAbbreviation},
 {courseCode -> departmentName},
 Since both of them are BCNF violations, they aren’t inserted in our schema. This since {studentNationalID} -> {programmeAbbreviation} can be written as the dependencies {studentNationalID} -> {programmeName} && {programmeName} -> {programmeAbbreviation}. Likewise, {courseCode} -> {departmentName} can be given from {courseCode} -> {departmentAbbrevation} && {departmentAbbrevation} -> {departmentName} 
