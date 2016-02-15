@@ -1,17 +1,17 @@
 All attributes are given by: 
-S={courseCode, courseMaxStudents,courseCredit, classificationName, grade, courseName, departmentName, departmentAbbrevation, programmeName, programmeAbbreviation, studentID, studentName, studentCredit, branchName, dateRegistredOnWaiting}
-
+S={courseCode, courseMaxStudents,courseCredit, classificationName, grade, courseName, departmentName, departmentAbbrevation, programmeName, programmeAbbreviation, studentSchoolID, studentNationalID, studentName, studentCredit, branchName, dateRegistredOnWaiting}
 
 The functional dependencies found: 
 {courseCode} -> {courseMaxStudents, courseCredit, departmentName, departmentAbbrevation}
 {departmentAbbrevation} -> {departmentName}
 {departmentName} -> {departmentAbbrevation}
 {programmeName} -> {programmeAbbreviation}
-{studentID} -> {studentName, studentCredit, branchName, programmeName, programmeAbbreviation}
-{studentID, courseCode} -> {dateRegisteredOnWaiting, grade}
+{studentNationalID} -> {studentName, studentSchoolID, studentCredit, branchName, programmeName, programmeAbbreviation}
+{studentNationalID, courseCode} -> {dateRegisteredOnWaiting, grade}
+{studentNationalID,studentNationalID, courseCode} -> firstStudent
 
-
-Almost all of above are visible in our database schema, except the following: 
-studentID -> programmeAbbreviation,
-courseCode -> departmentName,
-Since both of them are BCNF violations, they aren’t inserted in our schema. This since {studentID} -> {programmeAbbreviation} can be written as the dependencies {studentID} -> {programmeName} && {programmeName} -> {programmeAbbreviation}. Likewise, {courseCode} -> {departmentName} can be given from {courseCode} -> {departmentAbbrevation} && {departmentAbbrevation} -> {departmentName}
+Almost all of above are visible in our E-R diagram, except the following: 
+{departmentName} -> {departmentAbbreviation}. To solve this we have added the unique constraint to departmentName, and thus, if we have a departmentName we also get the key (departmentAbbreviation). 
+{studentNationalID -> programmeAbbreviation},
+{courseCode -> departmentName},
+Since both of them are BCNF violations, they aren’t inserted in our schema. This since {studentNationalID} -> {programmeAbbreviation} can be written as the dependencies {studentNationalID} -> {programmeName} && {programmeName} -> {programmeAbbreviation}. Likewise, {courseCode} -> {departmentName} can be given from {courseCode} -> {departmentAbbrevation} && {departmentAbbrevation} -> {departmentName} 
