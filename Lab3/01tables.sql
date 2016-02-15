@@ -39,10 +39,12 @@ CREATE TABLE Branch(
  );
 
 CREATE TABLE Student(
-	ID TEXT NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> ''),
+	NationalID CHAR(13) NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> '             '),  -- TODO sätt constraints!
+	SchoolID TEXT NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> ''),
 	Name TEXT NOT NULL CONSTRAINT student_name_not_empty CHECK(Name <> ''),
 	Programme TEXT NOT NUll,
-	PRIMARY KEY(ID),
+	PRIMARY KEY(NationalID),
+	UNIQUE(SchoolID),
 	FOREIGN KEY(Programme) REFERENCES Programme(Name)
 );
 
@@ -55,19 +57,19 @@ CREATE TABLE Prerequisite(
 );
 
 CREATE TABLE RegisteredOn(
-	Student TEXT NOT NULL,
+	Student CHAR(13) NOT NULL,
 	Course TEXT NOT NULL,
 	PRIMARY KEY(Student,Course),
-	FOREIGN KEY(Student) REFERENCES Student(ID),
+	FOREIGN KEY(Student) REFERENCES Student(NationalID),
 	FOREIGN KEY(Course) REFERENCES Course(Code)
 );
 
 CREATE TABLE HasFinished(
-	Student TEXT NOT NULL,
+	Student CHAR(13) NOT NULL,
 	Course TEXT NOT NUll,
 	Grade CHAR(1) NOT NULL CONSTRAINT hasfinished_valid_grade CHECK(Grade IN ('U','3','4','5')),
 	PRIMARY KEY(Student, Course),
-	FOREIGN KEY(Student) REFERENCES Student(ID),
+	FOREIGN KEY(Student) REFERENCES Student(NationalID),
 	FOREIGN KEY(Course) REFERENCES Course(Code)
 );
 
@@ -108,22 +110,22 @@ CREATE TABLE HasRecommended(
 );
 
 CREATE TABLE StudiesBranch(
-	Student TEXT NOT NULL,
+	Student CHAR(13) NOT NULL,
 	Branch TEXT NOT NULL,
 	Programme TEXT NOT NULL,
 	PRIMARY KEY(Student, Branch, Programme),
 	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
-	FOREIGN KEY(Student) REFERENCES Student(ID)
+	FOREIGN KEY(Student) REFERENCES Student(NationalID)
 );
 
 
 CREATE TABLE IsOnWaitingList(
-	Student TEXT NOT NULL,
+	Student CHAR(13) NOT NULL,
 	RestrictedCourse TEXT NOT NULL,
 	DateRegistered DATE NOT NULL,
 	PRIMARY KEY(Student, RestrictedCourse),
 	FOREIGN KEY(RestrictedCourse) REFERENCES RestrictedCourse(Code),
-	FOREIGN KEY(Student) REFERENCES Student(ID)
+	FOREIGN KEY(Student) REFERENCES Student(NationalID)
 );
 
 CREATE TABLE HasClassification(
