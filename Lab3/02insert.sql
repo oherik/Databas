@@ -94,10 +94,6 @@ VALUES
 ('MDA2687', 87)
 ;
 
-
-
-
-
 INSERT INTO Branch
 VALUES
 -- Should throw errors:
@@ -133,5 +129,12 @@ VALUES
 ('International Relations', 'Political Science'),
 ('Political Theory', 'Political Science')
 ;
+
+INSERT INTO Student
+VALUES
+-- Should throw errors:
+--
+-- Good values:
+(
 
 
