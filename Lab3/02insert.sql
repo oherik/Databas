@@ -22,7 +22,7 @@ INSERT INTO Programme
 VALUES
 	('Applied Information Technology', 'IT'),
 	('Computer Science', 'CS'),
-	('Electronic Engineering', 'E'),
+	('Electrical Engineering', 'E'),
 	('Mechanical Engineering', 'M'),
 	('Technical Design', 'TD'),
 	('Liberal Arts', 'LA'),
@@ -33,8 +33,8 @@ VALUES
 INSERT INTO Classification
 VALUES
 --Should not work:
-(''),
-(1.2),
+--(''),
+--(1.2),
 --Good values:
 ('Mathematical'),
 ('Research'),
@@ -107,8 +107,8 @@ VALUES
 ('Java and suchlike', 'Applied Information Technology'),
 ('Algorithms', 'Computer Science'),
 ('Low level programming', 'Computer Science'),
-('CPU construction', 'Electronic Engineering'),
-('Wire cutting', 'Electronic Engineering'),
+('CPU construction', 'Electrical Engineering'),
+('Wire cutting', 'Electrical Engineering'),
 ('Automotive', 'Mechanical Engineering'),
 ('Aeronautic', 'Mechanical Engineering'),
 ('Cortège', 'Mechanical Engineering'),
@@ -135,6 +135,24 @@ VALUES
 -- Should throw errors:
 --
 -- Good values:
-(
-
-
+('520215-3895','janjan','Jan Jansson','Nano-biotechnology'),
+('821103-7265','helbir','Helga Birgitsdotter','Political Science'),
+('560216-2579','quaank','Quarl Anka','Electrical Engineering'),
+('720805-9605','thestu','Therese Sturesson','Applied Information Technology'),
+('880121-5248','josulf','Josefin Ulfenborg','Political Science'),
+('680607-8793','hamron','Hampus Rönström','Computer Science'),
+('640328-8043','majnyb','Maja Nyberg','Applied Information Technology'),
+('871126-5028','sabsam','Sabrina Samuelsson','Applied Information Technology'),
+('851007-9091','oskwil','Oskar Wilman','Mechanical Engineering'),
+('620314-2044','johsch','Johanna Schüldt','Mechanical Engineering'),
+('570119-2162','maihap','Maija Happonen','Mechanical Engineering'),
+('721217-2204','micsod','Mickaela Södergren','Technical Design'),
+('780219-8973','mathog','Mats Högberg','Electrical Engineering'),
+('790307-6193','bjohed','Björn Hedström','Nano-biotechnology'),
+('841114-9571','toball','Tobias Alldén','Computer Science'),
+('19871229-8424','linhan','Linn Hansen','Political Science'),
+('19621217-7049','lovjab','Lovisa Jäberg','Liberal Arts'),
+('19721104-4396','jonlin','Jonas Lindberg','Liberal Arts'),
+('19851101-1325','aleket','Alexandra Kettil','Technical Design'),
+('19650430-7734','danlam','Danny Lam','Juridics')
+;

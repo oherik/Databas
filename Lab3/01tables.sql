@@ -17,7 +17,7 @@ CREATE TABLE Classification (
 );
 
 CREATE TABLE Course(
-	Code TEXT NOT NULL CONSTRAINT course_name_not_empty CHECK(Code <> ''),
+	Code TEXT NOT NULL CONSTRAINT course_code_not_empty CHECK(Code <> ''),
 	Credit FLOAT NOT NULL CONSTRAINT course_credit_positive CHECK(Credit > 0),
 	Name TEXT NOT NULL CONSTRAINT course_name_not_empty CHECK(Name <> ''),
 	Department CHAR(4) NOT NULL CONSTRAINT course_department_not_empty CHECK(Department <> '    '),
