@@ -39,7 +39,7 @@ CREATE TABLE Branch(
  );
 
 CREATE TABLE Student(
-	NationalID CHAR(13) NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> '             '), CONSTRAINT student_id_not_matching_format  -- TODO sätt constraints!
+	NationalID CHAR(13) NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> ''), CONSTRAINT student_id_not_matching_format SIMILAR TO '[^0-9]*6[^0-9]*$'
 	SchoolID TEXT NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> ''),
 	Name TEXT NOT NULL CONSTRAINT student_name_not_empty CHECK(Name <> ''),
 	Programme TEXT NOT NUll,
