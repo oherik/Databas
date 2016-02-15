@@ -17,7 +17,7 @@ CREATE TABLE Classification (
 );
 
 CREATE TABLE Course(
-	Code TEXT NOT NULL CONSTRAINT course_name_not_empty CHECK(Code <> ''),
+	Code TEXT NOT NULL CONSTRAINT course_code_not_empty CHECK(Code <> ''),
 	Credit FLOAT NOT NULL CONSTRAINT course_credit_positive CHECK(Credit > 0),
 	Name TEXT NOT NULL CONSTRAINT course_name_not_empty CHECK(Name <> ''),
 	Department CHAR(4) NOT NULL CONSTRAINT course_department_not_empty CHECK(Department <> '    '),
@@ -39,8 +39,8 @@ CREATE TABLE Branch(
  );
 
 CREATE TABLE Student(
-	NationalID CHAR(13) NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> '             '),  -- TODO sätt constraints!
-	SchoolID TEXT NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> ''),
+	NationalID CHAR(13) NOT NULL CONSTRAINT student_nationalid_not_empty CHECK(NationalID <> '             '),  -- TODO sätt constraints!
+	SchoolID TEXT NOT NULL CONSTRAINT student__schoolid_not_empty CHECK(SchoolID <> ''),
 	Name TEXT NOT NULL CONSTRAINT student_name_not_empty CHECK(Name <> ''),
 	Programme TEXT NOT NUll,
 	PRIMARY KEY(NationalID),
