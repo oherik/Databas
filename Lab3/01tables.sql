@@ -39,7 +39,7 @@ CREATE TABLE Branch(
  );
 
 CREATE TABLE Student(
-	NationalID CHAR(13) NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> '             '),  -- TODO sätt constraints!
+	NationalID CHAR(13) NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> '             '), CONSTRAINT student_id_not_matching_format  -- TODO sätt constraints!
 	SchoolID TEXT NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> ''),
 	Name TEXT NOT NULL CONSTRAINT student_name_not_empty CHECK(Name <> ''),
 	Programme TEXT NOT NUll,
@@ -113,19 +113,20 @@ CREATE TABLE StudiesBranch(
 	Student CHAR(13) NOT NULL,
 	Branch TEXT NOT NULL,
 	Programme TEXT NOT NULL,
-	PRIMARY KEY(Student, Branch, Programme),
+	PRIMARY KEY(Student),
 	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
-	FOREIGN KEY(Student) REFERENCES Student(NationalID)
+	FOREIGN KEY(Student, Programme) REFERENCES Student(NationalID, Programme)
 );
 
 
 CREATE TABLE IsOnWaitingList(
 	Student CHAR(13) NOT NULL,
 	RestrictedCourse TEXT NOT NULL,
-	DateRegistered DATE NOT NULL,
+	QueuePos INT NOT NULL,
 	PRIMARY KEY(Student, RestrictedCourse),
 	FOREIGN KEY(RestrictedCourse) REFERENCES RestrictedCourse(Code),
-	FOREIGN KEY(Student) REFERENCES Student(NationalID)
+	FOREIGN KEY(Student) REFERENCES Student(NationalID),
+    UNIQUE (QueuePos, RestrictedCourse)
 );
 
 CREATE TABLE HasClassification(
