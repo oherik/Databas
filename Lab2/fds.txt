@@ -1,5 +1,5 @@
 All attributes are given by: 
-S={courseCode, courseMaxStudents,courseCredit, classificationName, grade, courseName, departmentName, departmentAbbrevation, programmeName, programmeAbbreviation, studentSchoolID, studentNationalID, studentName, studentCredit, branchName, timeDateRegistredOnWaiting}
+S={courseCode, courseMaxStudents,courseCredit, classificationName, grade, courseName, departmentName, departmentAbbrevation, programmeName, programmeAbbreviation, studentSchoolID, studentNationalID, studentName, studentCredit, branchName, queuePos}
 
 The functional dependencies found: 
 {courseCode} -> {courseMaxStudents, courseCredit, departmentName, departmentAbbrevation}
@@ -7,15 +7,17 @@ The functional dependencies found:
 {departmentName} -> {departmentAbbrevation}
 {programmeName} -> {programmeAbbreviation}
 {studentNationalID} -> {studentName, studentSchoolID, studentCredit, branchName, programmeName, programmeAbbreviation}
-{studentNationalID, courseCode} -> {timeDateRegistredOnWaiting, grade}
+{studentNationalID, courseCode} -> {queuePos, grade}
 {studentSchoolID} -> {studentName, studentNationalID, studentCredit, branchName, programmeName, programmeAbbreviation}
-{studentSchoolID, courseCode} -> {timeDateRegistredOnWaiting, grade}
-{timeDateRegistredOnWaiting,timeDateRegistredOnWaiting, courseCode} -> {studentNationalID}
+{studentSchoolID, courseCode} -> {queuePos, grade}
+{queuePos, queuePos, courseCode} -> {studentNationalID}
+{studentNationalID,studentNationalID, courseCode} -> {studentNationalID}
 (describing which student that is first in line)
 
 Almost all of above are visible in our E-R diagram, except the following: 
 {departmentName} -> {departmentAbbreviation}. To solve this we have added the unique constraint to departmentName, and thus, if we have a departmentName we also get the key (departmentAbbreviation). 
-{studentSchoolID, courseCode} -> {timeDateRegistredOnWaiting, grade}
+Since we get programmeName from studentNationalID, we add a referencing constraint to studies branch, to handle the cyclic relationship. 
+{studentSchoolID, courseCode} -> {queuePos, grade}
 {studentSchoolID} -> {studentName, studentNationalID, studentCredit, branchName, programmeName, programmeAbbreviation}, To solve this we have added the unique constraint to schoolID, therefor studentNationalID can be reached from studentSchoolID and everything else can be reached from studentNationalID. 
 {studentNationalID -> programmeAbbreviation},
 {courseCode -> departmentName},
