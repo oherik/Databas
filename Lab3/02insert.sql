@@ -7,7 +7,7 @@ INSERT INTO Department
 VALUES
 	('Computer Science and Engineering', 'CSE'),
 	('Mechanical Engineering', 'ME'),
-	('Electronic Engineering', 'EE'),
+	('Electrical Engineering', 'EE'),
 	('Humanities', 'HUM'),
 	('Biomedical Science', 'BMS'),
 	('Mathematics', 'M')
@@ -105,6 +105,7 @@ VALUES
 ('Software Engineering', 'Applied Information Technology'),
 ('Graphical Experience', 'Applied Information Technology'),
 ('Java and suchlike', 'Applied Information Technology'),
+('Algorithms', 'Applied Information Technology'),
 ('Algorithms', 'Computer Science'),
 ('Low level programming', 'Computer Science'),
 ('CPU construction', 'Electrical Engineering'),
@@ -203,14 +204,14 @@ VALUES
 ('720805-9605','GUI222'),
 ('880121-5248','LAW3444'),
 ('680607-8793','TDA233'),
-('640328-8043','TDA233'),
+('640328-8043','DAT321'),
 ('871126-5028','DAT321'),
+('851007-9091','MVE334'),
 ('851007-9091','MVE343'),
-('851007-9091','MVE233'),
 ('570119-2162','TD333'),
 ('721217-2204','TD333'),
 ('790307-6193','MDA2687'),
-('841114-9571','TDA357'),
+('841114-9571','TDA233'),
 ('19871229-8424','POL34'),
 ('19721104-4396','LAW4444'),
 ('19851101-1325','FYA344'),
@@ -230,82 +231,135 @@ VALUES
 -- Good values:
 ('19721104-4396','LAW3444', '3'),
 ('19851101-1325','TD333', '5'),
-('560216-2579','MVE334', '4'),
-('560216-2579','MVE343', '3'),
+('560216-2579','MVE343', '4'),
+('560216-2579','MVE334', '3'),
 ('780219-8973','MVE343', '5'),
 ('880121-5248','POL227', 'U'),
 ('620314-2044', 'MVE343', '4'),
 ('620314-2044', 'MVE334', '5'),
 ('620314-2044', 'MVE357', '4'),
-('620314-2044', 'MVE233', '3')
+('620314-2044', 'FYA344', '3')
 ;
 
 INSERT INTO HostedBy
 VALUES
 -- Should throw errors:
 --
--- Good values::
+-- Good values:
+('Applied Information Technology', 'CSE'),
+('Computer Science', 'CSE'),
+('Electrical Engineering', 'EE'),
+('Mechanical Engineering', 'ME'),
+('Technical Design', 'ME'),
+('Liberal Arts', 'HUM'),
+('Juridics', 'HUM'),
+('Nano-biotechnology', 'BMS'),
+('Political Science', 'HUM')
+;
 
-CREATE TABLE HostedBy(
-	Programme TEXT NOT NULL,
-	Department CHAR(4) NOT NULL,
-	PRIMARY KEY(Programme, Department),
-	FOREIGN KEY(Programme) REFERENCES Programme(Name),
-	FOREIGN KEy(Department) REFERENCES Department(Abbreviation)
-);
+INSERT INTO ProgrammeHasMandatory
+VALUES
+-- Should throw errors:
+--
+-- Good values:
+('Applied Information Technology', 'MVE343'),
+('Computer Science', 'MVE343'),
+('Electrical Engineering', 'MVE343'),
+('Mechanical Engineering', 'MVE343'),
+('Technical Design', 'MVE343'),
+('Juridics', 'LAW3444'),
+('Nano-biotechnology', 'MED21')
+;
 
-CREATE TABLE ProgrammeHasMandatory(
-	Programme TEXT NOT NULL,
-	Course TEXT NOT NULL,
-	PRIMARY KEY(Programme, Course),
-	FOREIGN KEY(Programme) REFERENCES Programme(Name),
-	FOREIGN KEY(Course) REFERENCES Course(Code)
-);
+INSERT INTO BranchHasMandatory
+VALUES
+-- Should throw errors:
+--
+-- Good values:
+('Algorithms','Applied Information Technology', 'DAT321'),
+('Algorithms','Computer Science', 'TDA233'),
+('Automotive', 'Mechanical Engineering', 'FYA344'),
+('Aeronautic', 'Mechanical Engineering', 'FYA344'),
+('User Interfaces', 'Technical Design', 'GUI222'),
+('Graphical Experience', 'Applied Information Technology', 'GUI222'),
+('International Law', 'Juridics','POL34'),
+('Nanorobotics', 'Nano-biotechnology', 'MDA2687')
+;
 
+INSERT INTO HasRecommended
+VALUES
+-- Should throw errors:
+--
+-- Good values:
+('Software Engineering', 'Applied Information Technology', 'TDA358'),
+('Automotive', 'Mechanical Engineering', 'FYA4367'),
+('Production Design', 'Technical Design', 'TD333'),
+('International Law', 'Juridics', 'POL227'),
+('Private Juridics', 'Juridics', 'LAW4444'),
+('International Relations', 'Political Science', 'POL34'),
+('International Relations', 'Political Science', 'POL227'),
+('CPU construction', 'Electrical Engineering', 'TDA233')
+;
 
-CREATE TABLE BranchHasMandatory(
-	Branch TEXT NOT NULL,
-	Programme TEXT NOT NULL,
-	Course TEXT NOT NULL,
-	PRIMARY KEY(Branch, Programme, Course),
-	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
-	FOREIGN KEY(Course) REFERENCES Course(Code)
-);
+INSERT INTO StudiesBranch
+VALUES
+-- Should throw errors:
+--
+-- Good values:
+('520215-3895','Nanorobotics', 'Nano-biotechnology'),
+('821103-7265','International Relations', 'Political Science'),
+('680607-8793','Algorithms', 'Computer Science'),
+('640328-8043','Algorithms', 'Applied Information Technology'),
+('871126-5028','Graphical Experience', 'Applied Information Technology'),
+('851007-9091','Automotive', 'Mechanical Engineering'),
+('620314-2044','Automotive', 'Mechanical Engineering'),
+('570119-2162','Cortège', 'Mechanical Engineering'),
+('780219-8973','CPU construction', 'Electrical Engineering'),
+('790307-6193','Nanorobotics', 'Nano-biotechnology'),
+('841114-9571','Algorithms', 'Computer Science'),
+('19871229-8424','Political Theory', 'Political Science'),
+('19621217-7049','History', 'Liberal Arts'),
+('19851101-1325','User Interfaces', 'Technical Design'),
+('19650430-7734','International Law', 'Juridics')
+;
 
+INSERT INTO IsOnWaitingList
+VALUES
+-- Should throw errors:
+-- För högt tal (>maxStudents)
+-- Negativt tal
+-- Nulldata etc
+-- '3' istället för 3 och sånt
+-- Good values:
+('851007-9091','TDA358',1),
+('620314-2044','TDA358',4),
+('19621217-7049','LAW4444', 3),
+('790307-6193', 'MED21',3)
+;
 
-CREATE TABLE HasRecommended(
-	Branch TEXT NOT NULL,
-	Programme TEXT NOT NULL,
-	Course TEXT NOT NULL,
-	PRIMARY KEY(Branch, Programme, Course),
-	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
-	FOREIGN KEY(Course) REFERENCES Course(Code)
-);
+INSERT INTO HasClassification
+VALUES
+-- Should throw errors:
+-- TODO: Ska man kunna ha två classifications?
+-- Good values:
+('TDA357','Seminar'),
+('TDA383', 'Seminar'),
+('MVE343', 'Mathematical'),
+('MVE343', 'Seminar'),
+('TD333', 'Seminar'), 
+('DAT321', 'Seminar'),
+('TDA233', 'Research'),
+('MVE334', 'Mathematical'),
+('POL227', 'Seminar'),
+('FYA344', 'Mathematical'),
+('FYA344', 'Seminar'),
+('FYA27', 'Seminar'),
+('FYA4367', 'Research'),
+('POL34', 'Research'),
+('MVE357', 'Mathematical'),
+('MVE357', 'Research'),
+('MDA2687', 'Research'),
+('MED21', 'Research'),
+('LAW4444', 'Research')
+;
 
-CREATE TABLE StudiesBranch(
-	Student CHAR(13) NOT NULL,
-	Branch TEXT NOT NULL,
-	Programme TEXT NOT NULL,
-	PRIMARY KEY(Student),
-	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
-	FOREIGN KEY(Student, Programme) REFERENCES Student(NationalID, Programme)
-);
-
-
-CREATE TABLE IsOnWaitingList(
-	Student CHAR(13) NOT NULL,
-	RestrictedCourse TEXT NOT NULL,
-	QueuePos INT NOT NULL,
-	PRIMARY KEY(Student, RestrictedCourse),
-	FOREIGN KEY(RestrictedCourse) REFERENCES RestrictedCourse(Code),
-	FOREIGN KEY(Student) REFERENCES Student(NationalID),
-    UNIQUE (QueuePos, RestrictedCourse)
-);
-
-CREATE TABLE HasClassification(
-	Course TEXT NOT NULL,
-	Classification TEXT NOT NULL,
-	PRIMARY KEY(Course, Classification),
-	FOREIGN KEY(Course) REFERENCES Course(Code),
-	FOREIGN KEY(Classification) REFERENCES Classification(Name)
-);

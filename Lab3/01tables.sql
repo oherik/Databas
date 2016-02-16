@@ -39,14 +39,23 @@ CREATE TABLE Branch(
  );
 
 CREATE TABLE Student(
-	NationalID CHAR(13) NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> ''), CONSTRAINT student_id_not_matching_format SIMILAR TO '[^0-9]*6[^0-9]*$'
-	SchoolID TEXT NOT NULL CONSTRAINT student_id_not_empty CHECK(ID <> ''),
+	NationalID CHAR(13) NOT NULL CONSTRAINT student_nationalid_not_empty CHECK(NationalID <> ''), 
+	-- TODO The constraint below doesn't work as intended
+		CONSTRAINT student_id_not_matching_format SIMILAR TO '[^0-9]*6[^0-9]*$'
+	SchoolID TEXT NOT NULL CONSTRAINT student_schoolid_not_empty CHECK(SchoolID <> ''),
 	Name TEXT NOT NULL CONSTRAINT student_name_not_empty CHECK(Name <> ''),
 	Programme TEXT NOT NUll,
 	PRIMARY KEY(NationalID),
 	UNIQUE(SchoolID),
+	UNIQUE(NationalID, Programme),  -- TODO: Osäker på detta, kolla upp
 	FOREIGN KEY(Programme) REFERENCES Programme(Name)
 );
+
+
+
+-- TODO Fix empty string checks below
+
+
 
 CREATE TABLE Prerequisite(
 	Course TEXT NOT NULL,
@@ -122,7 +131,7 @@ CREATE TABLE StudiesBranch(
 CREATE TABLE IsOnWaitingList(
 	Student CHAR(13) NOT NULL,
 	RestrictedCourse TEXT NOT NULL,
-	QueuePos INT NOT NULL,
+	QueuePos INT NOT NULL CONSTRAINT IsOnWaitingList_QueuePos_Positive CHECK(QueuePos > 0),
 	PRIMARY KEY(Student, RestrictedCourse),
 	FOREIGN KEY(RestrictedCourse) REFERENCES RestrictedCourse(Code),
 	FOREIGN KEY(Student) REFERENCES Student(NationalID),
