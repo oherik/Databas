@@ -133,7 +133,20 @@ VALUES
 INSERT INTO Student
 VALUES
 -- Should throw errors:
---
+-- ('195203153895','janjan','Jan Jansson','Nano-biotechnology'),
+-- ('5203153895','janjan','Jan Jansson','Nano-biotechnology'),
+-- ('520315-3895','','Jan Jansson','Nano-biotechnology'),
+-- ('520315-3895',,'Jan Jansson','Nano-biotechnology'),
+-- ('520315-3895','janjan','Jan Jansson','Nano-biotechnology'),
+-- ('520315-3895','janjan','','Nano-biotechnology'),
+-- ('520315-3895','janjan','Jan Jansson',''),
+-- ('520315-3895','janjan','Jan Jansson','Non-existing programme'),
+-- ('520315-3895','janjan','Jan Jansson','NBT'),
+-- ('','janjan','Jan Jansson','Nano-biotechnology'),
+-- ('529315-3895','janjan','Jan Jansson','Nano-biotechnology'),
+-- ('520395-3895','janjan','Jan Jansson','Nano-biotechnology'),
+-- ('5203153-895','janjan','Jan Jansson','Nano-biotechnology'),
+-- ('52031-53895','janjan','Jan Jansson','Nano-biotechnology'),
 -- Good values:
 ('520215-3895','janjan','Jan Jansson','Nano-biotechnology'),
 ('821103-7265','helbir','Helga Birgitsdotter','Political Science'),
@@ -156,3 +169,19 @@ VALUES
 ('19851101-1325','aleket','Alexandra Kettil','Technical Design'),
 ('19650430-7734','danlam','Danny Lam','Juridics')
 ;
+
+INSert INTO Prerequisite
+VALUES
+-- Should throw errors:
+--
+-- Good values:
+
+);
+
+CREATE TABLE Prerequisite(
+	Course TEXT NOT NULL,
+	RequiredCourse TEXT NOT NULL,
+	PRIMARY KEY(Course, RequiredCourse),
+	FOREIGN KEY(Course) REFERENCES Course(Code),
+	FOREIGN KEY(RequiredCourse) REFERENCES Course(Code)
+);
