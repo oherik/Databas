@@ -185,3 +185,127 @@ VALUES
 ('FYA4367', 'MVE343'),
 ('MVE357', 'MVE334')
 ;
+
+INSERT INTO RegisteredOn
+VALUES
+-- Should throw errors:
+-- ('520215-3895','MED21'),('520215-3895','MED21'),
+-- ('Non-existing','MVE343'),
+-- ('520215-3895','Non-existing'),
+-- ('','Non-existing'),
+-- ('520215-3895',''),
+-- ('520215-3895','MED21', 'MVE343'),
+-- TODO: Ska man kunna ta gå    Kurs -> kräver1 -> kräver2 ? Och godkänt betyg?
+-- Good values:
+('520215-3895','MED21'),
+('520215-3895','MDA2687'),
+('560216-2579','MVE357'),
+('720805-9605','GUI222'),
+('880121-5248','LAW3444'),
+('680607-8793','TDA233'),
+('640328-8043','TDA233'),
+('871126-5028','DAT321'),
+('851007-9091','MVE343'),
+('851007-9091','MVE233'),
+('570119-2162','TD333'),
+('721217-2204','TD333'),
+('790307-6193','MDA2687'),
+('841114-9571','TDA357'),
+('19871229-8424','POL34'),
+('19721104-4396','LAW4444'),
+('19851101-1325','FYA344'),
+('19650430-7734','LAW3444')
+;
+
+INSERT INTO HasFinished
+VALUES
+-- Should throw errors:
+-- ('19721104-4396','LAW3444', 'I'),
+-- ('620314-2044', 'TD333', 4),
+-- ('Non-existing','LAW3444', '3'),
+-- ('19721104-4396','Non-existing', '3'),
+-- ('','LAW3444', '3'),
+-- ('19721104-4396','', '3'),
+-- ('19721104-4396','LAW3444', ''),
+-- Good values:
+('19721104-4396','LAW3444', '3'),
+('19851101-1325','TD333', '5'),
+('560216-2579','MVE334', '4'),
+('560216-2579','MVE343', '3'),
+('780219-8973','MVE343', '5'),
+('880121-5248','POL227', 'U'),
+('620314-2044', 'MVE343', '4'),
+('620314-2044', 'MVE334', '5'),
+('620314-2044', 'MVE357', '4'),
+('620314-2044', 'MVE233', '3')
+;
+
+INSERT INTO HostedBy
+VALUES
+-- Should throw errors:
+--
+-- Good values::
+
+CREATE TABLE HostedBy(
+	Programme TEXT NOT NULL,
+	Department CHAR(4) NOT NULL,
+	PRIMARY KEY(Programme, Department),
+	FOREIGN KEY(Programme) REFERENCES Programme(Name),
+	FOREIGN KEy(Department) REFERENCES Department(Abbreviation)
+);
+
+CREATE TABLE ProgrammeHasMandatory(
+	Programme TEXT NOT NULL,
+	Course TEXT NOT NULL,
+	PRIMARY KEY(Programme, Course),
+	FOREIGN KEY(Programme) REFERENCES Programme(Name),
+	FOREIGN KEY(Course) REFERENCES Course(Code)
+);
+
+
+CREATE TABLE BranchHasMandatory(
+	Branch TEXT NOT NULL,
+	Programme TEXT NOT NULL,
+	Course TEXT NOT NULL,
+	PRIMARY KEY(Branch, Programme, Course),
+	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
+	FOREIGN KEY(Course) REFERENCES Course(Code)
+);
+
+
+CREATE TABLE HasRecommended(
+	Branch TEXT NOT NULL,
+	Programme TEXT NOT NULL,
+	Course TEXT NOT NULL,
+	PRIMARY KEY(Branch, Programme, Course),
+	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
+	FOREIGN KEY(Course) REFERENCES Course(Code)
+);
+
+CREATE TABLE StudiesBranch(
+	Student CHAR(13) NOT NULL,
+	Branch TEXT NOT NULL,
+	Programme TEXT NOT NULL,
+	PRIMARY KEY(Student),
+	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
+	FOREIGN KEY(Student, Programme) REFERENCES Student(NationalID, Programme)
+);
+
+
+CREATE TABLE IsOnWaitingList(
+	Student CHAR(13) NOT NULL,
+	RestrictedCourse TEXT NOT NULL,
+	QueuePos INT NOT NULL,
+	PRIMARY KEY(Student, RestrictedCourse),
+	FOREIGN KEY(RestrictedCourse) REFERENCES RestrictedCourse(Code),
+	FOREIGN KEY(Student) REFERENCES Student(NationalID),
+    UNIQUE (QueuePos, RestrictedCourse)
+);
+
+CREATE TABLE HasClassification(
+	Course TEXT NOT NULL,
+	Classification TEXT NOT NULL,
+	PRIMARY KEY(Course, Classification),
+	FOREIGN KEY(Course) REFERENCES Course(Code),
+	FOREIGN KEY(Classification) REFERENCES Classification(Name)
+);
