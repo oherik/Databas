@@ -58,7 +58,7 @@ VALUES
 ('MVE343', 2.5, 'Introductory Course in Algebra', 'M'),
 ('TD333', 3, 'Newtonian Design', 'ME'),
 ('DAT321', 7.5, 'Data Structures and Algorithms', 'CSE'),
-('TDA233', 7.5, 'Algorithms and data Structures', 'CSE'),
+('TDA233', 7.5, 'Algorithms and Data Structures', 'CSE'),
 ('MVE334', 7.5, 'Analysis in Multiple Variables', 'M'),
 ('POL227', 8.5, 'Geopolitics', 'HUM'),
 ('FYA344', 7.5, 'Control Engineering', 'ME'),
@@ -170,18 +170,18 @@ VALUES
 ('19650430-7734','danlam','Danny Lam','Juridics')
 ;
 
-INSert INTO Prerequisite
+INSERT INTO Prerequisite
 VALUES
 -- Should throw errors:
---
+-- ('TDA357','TDA357'),
+-- ('Non-existing','MVE343'),
+-- ('MVE343', 'Non-existing'),
+-- TODO: Ska man kunna ta gå    Kurs -> kräver1 -> kräver2 ?
 -- Good values:
-
-);
-
-CREATE TABLE Prerequisite(
-	Course TEXT NOT NULL,
-	RequiredCourse TEXT NOT NULL,
-	PRIMARY KEY(Course, RequiredCourse),
-	FOREIGN KEY(Course) REFERENCES Course(Code),
-	FOREIGN KEY(RequiredCourse) REFERENCES Course(Code)
-);
+('MVE334', 'MVE343'),
+('LAW4444', 'LAW3444'),
+('FYA344', 'MVE343'),
+('FYA344', 'TD333'),
+('FYA4367', 'MVE343'),
+('MVE357', 'MVE334')
+;
