@@ -41,7 +41,7 @@ CREATE TABLE Branch(
 CREATE TABLE Student(
 	NationalID CHAR(13) NOT NULL CONSTRAINT student_nationalid_not_empty CHECK(NationalID <> ''), 
 	-- TODO The constraint below doesn't work as intended
-		CONSTRAINT student_id_not_matching_format SIMILAR TO '[^0-9]*6[^0-9]*$'
+		--CONSTRAINT student_id_not_matching_format SIMILAR TO '[^0-9]*6[^0-9]*$'
 	SchoolID TEXT NOT NULL CONSTRAINT student_schoolid_not_empty CHECK(SchoolID <> ''),
 	Name TEXT NOT NULL CONSTRAINT student_name_not_empty CHECK(Name <> ''),
 	Programme TEXT NOT NUll,

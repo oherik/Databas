@@ -2,7 +2,7 @@ CREATE VIEW StudentsFollowing AS
 SELECT  NationalID,
 SchoolID,
 Name,
-Programme,
+Student.Programme,
 Branch
 FROM    Student JOIN StudiesBranch
 ON      StudiesBranch.Student = Student.NationalID;
@@ -17,26 +17,40 @@ ON      HasFinished.Course = Course.Code;
 
 CREATE VIEW Registrations AS
 SELECT  Student,
-Name AS CourseName,
+Code AS CourseCode,
 'Waiting' AS Status
 FROM    IsOnWaitingList JOIN Course
 ON      IsOnWaitingList.RestrictedCourse = Course.Code
 UNION
 SELECT  Student,
-Name AS CourseName,
+Code AS CourseCode,
 'Registred' AS Status
 FROM    RegisteredOn JOIN Course
 ON      RegisteredOn.Course = Course.Code;
 
 CREATE VIEW PassedCourses AS
 SELECT  Student,
-Name AS CourseName,
+Code AS CourseCode,
 Credit
 FROM    HasFinished JOIN Course
-ON      HasFinished.Course = Course.Code;
-WHERE   Grade <> 'U';'
+ON      HasFinished.Course = Course.Code
+WHERE   Grade <> 'U';
 
-//CREATE VIEW UnreadMandatory AS
-//SELECT  Student,
-Name AS CourseName
-//FROM    PR
+CREATE VIEW UnreadMandatory AS
+SELECT NationalID as Student,
+		Course	as Unread_Course
+FROM
+	StudentsFollowing JOIN ProgrammeHasMandatory
+ 	ON StudentsFollowing.Programme = ProgrammeHasMandatory.Programme
+UNION DISTINCT
+SELECT NationalID, 
+		Course
+FROM
+	StudentsFollowing JOIN BranchHasMandatory
+	ON StudentsFollowing.Branch = BranchHasMandatory.Branch AND StudentsFollowing.Programme = BranchHasMandatory.Programme
+
+EXCEPT
+SELECT Student, CourseCode
+FROM PassedCourses
+;
+
