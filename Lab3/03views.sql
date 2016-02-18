@@ -48,7 +48,7 @@ FROM
  	ON StudentsFollowing.Programme = ProgrammeHasMandatory.Programme
 UNION DISTINCT
 SELECT NationalID,
-		Course
+		Course as Unread_Course
 FROM
 	StudentsFollowing JOIN BranchHasMandatory
 	ON StudentsFollowing.Branch = BranchHasMandatory.Branch AND StudentsFollowing.Programme = BranchHasMandatory.Programme
@@ -56,34 +56,28 @@ FROM
 EXCEPT
 SELECT Student, CourseCode
 FROM PassedCourses
+ORDER BY Student DESC ;
 ;
 CREATE VIEW PathToGraduation AS
-SELECT NationalID AS StudentID,
-        Sum(Credit) AS TotalCredit
-        --Count(Unread_Course) AS NbrMandatoryLeft
+        SELECT
+        StudentID,
+        TotalCredit,
+        Count(Unread_Course) AS NbrMandatoryLeft
         --MathCredits,
         --ResearchCredit,
         --NbrOfSeminarCourses,
         --Qualify
-FROM StudentsFollowing JOIN PassedCourses
-ON      StudentsFollowing.NationalID = PassedCourses.Student
-     --   JOIN UnreadMandatory
---ON      StudentsFollowing.NationalID = UnreadMandatory.Student
-GROUP BY StudentID
-UNION DISTINCT
--- When no courses are passed
-SELECT NationalID AS StudentID,
-        0 AS TotalCredit
-        --Count(Unread_Course) AS NbrMandatoryLeft
-        --MathCredits,
-        --ResearchCredit,
-        --NbrOfSeminarCourses,
-        --Qualify
-FROM StudentsFollowing JOIN PassedCourses
-ON      StudentsFollowing.NationalID <> PassedCourses.Student
-       -- JOIN UnreadMandatory
---ON      StudentsFollowing.NationalID = UnreadMandatory.Student
-GROUP BY StudentID
+FROM (
+        SELECT NationalID AS StudentID,
+                Sum(Credit) AS TotalCredit
+        FROM StudentsFollowing
+                FULL OUTER JOIN PassedCourses
+        ON      StudentsFollowing.NationalID = PassedCourses.Student
+        GROUP BY StudentID) AS SumCredit
+FULL OUTER JOIN UnreadMandatory
+ON      SumCredit.StudentID = UnreadMandatory.Student
+GROUP BY StudentID,TotalCredit
+ORDER BY StudentID DESC ;
 ;
 
 
