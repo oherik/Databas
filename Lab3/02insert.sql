@@ -1,3 +1,4 @@
+
 INSERT INTO Department
 --	Should throw errors:
 -- VALUES('Test', 'TOOMANYLETTERS'),
@@ -238,7 +239,13 @@ VALUES
 ('620314-2044', 'MVE343', '4'),
 ('620314-2044', 'MVE334', '5'),
 ('620314-2044', 'MVE357', '4'),
-('620314-2044', 'FYA344', '3')
+('620314-2044', 'FYA344', '3'),
+('620314-2044', 'DAT321', '3'),
+	('620314-2044', 'TDA233', '3'),
+('620314-2044', 'TDA358', '3'),
+
+('19650430-7734','LAW3444', '3'),
+('19650430-7734','DAT321', '3')
 ;
 
 INSERT INTO HostedBy
@@ -277,13 +284,13 @@ VALUES
 --
 -- Good values:
 ('Algorithms','Applied Information Technology', 'DAT321'),
-('Algorithms','Computer Science', 'TDA233'),
-('Automotive', 'Mechanical Engineering', 'FYA344'),
-('Aeronautic', 'Mechanical Engineering', 'FYA344'),
-('User Interfaces', 'Technical Design', 'GUI222'),
-('Graphical Experience', 'Applied Information Technology', 'GUI222'),
-('International Law', 'Juridics','POL34'),
-('Nanorobotics', 'Nano-biotechnology', 'MDA2687')
+('Algorithms','Computer Science', 'DAT321'),
+('Automotive', 'Mechanical Engineering', 'DAT321'),
+('Aeronautic', 'Mechanical Engineering', 'DAT321'),
+('User Interfaces', 'Technical Design', 'DAT321'),
+('Graphical Experience', 'Applied Information Technology', 'DAT321'),
+('International Law', 'Juridics','DAT321'),
+('Nanorobotics', 'Nano-biotechnology', 'DAT321')
 ;
 
 INSERT INTO HasRecommended
@@ -298,7 +305,10 @@ VALUES
 ('Private Juridics', 'Juridics', 'LAW4444'),
 ('International Relations', 'Political Science', 'POL34'),
 ('International Relations', 'Political Science', 'POL227'),
-('CPU construction', 'Electrical Engineering', 'TDA233')
+('CPU construction', 'Electrical Engineering', 'TDA233'),
+('Automotive', 'Mechanical Engineering', 'TDA233'),
+('Automotive', 'Mechanical Engineering', 'MVE357'),
+('Automotive', 'Mechanical Engineering', 'TDA358')
 ;
 
 INSERT INTO StudiesBranch
@@ -362,4 +372,3 @@ VALUES
 ('MED21', 'Research'),
 ('LAW4444', 'Research')
 ;
-
