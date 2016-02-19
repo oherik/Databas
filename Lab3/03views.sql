@@ -47,17 +47,18 @@ FROM
 	StudentsFollowing JOIN ProgrammeHasMandatory
  	ON StudentsFollowing.Programme = ProgrammeHasMandatory.Programme
 UNION DISTINCT
-SELECT NationalID,
+  SELECT NationalID,
 		Course as Unread_Course
-FROM
-	StudentsFollowing JOIN BranchHasMandatory
-	ON StudentsFollowing.Branch = BranchHasMandatory.Branch AND StudentsFollowing.Programme = BranchHasMandatory.Programme
+  FROM
+	 StudentsFollowing JOIN BranchHasMandatory
+	 ON StudentsFollowing.Branch = BranchHasMandatory.Branch AND StudentsFollowing.Programme = BranchHasMandatory.Programme
 
 EXCEPT
-SELECT Student, CourseCode
-FROM PassedCourses
-ORDER BY Student DESC ;
+  SELECT Student, CourseCode
+  FROM PassedCourses
+  ORDER BY Student DESC;
 ;
+
 CREATE VIEW PathToGraduationHelp AS
 SELECT
       TotalCreditTable.StudentID AS Student,

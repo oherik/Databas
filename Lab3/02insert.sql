@@ -178,7 +178,6 @@ VALUES
 -- ('TDA357','TDA357'),
 -- ('Non-existing','MVE343'),
 -- ('MVE343', 'Non-existing'),
--- TODO: Ska man kunna ta gå    Kurs -> kräver1 -> kräver2 ?
 -- Good values:
 ('MVE334', 'MVE343'),
 ('LAW4444', 'LAW3444'),
@@ -197,7 +196,6 @@ VALUES
 -- ('','Non-existing'),
 -- ('520215-3895',''),
 -- ('520215-3895','MED21', 'MVE343'),
--- TODO: Ska man kunna ta gå    Kurs -> kräver1 -> kräver2 ? Och godkänt betyg?
 -- Good values:
 ('520215-3895','MED21'),
 ('520215-3895','MDA2687'),
@@ -351,7 +349,7 @@ VALUES
 INSERT INTO HasClassification
 VALUES
 -- Should throw errors:
--- TODO: Ska man kunna ha två classifications?
+-- 
 -- Good values:
 ('TDA357','Seminar'),
 ('TDA383', 'Seminar'),
