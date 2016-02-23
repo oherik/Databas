@@ -152,3 +152,8 @@ WHERE(
   MandatoryLeft > 0 OR RecommendedCredit < 10 OR MathCredit < 20
   OR ResearchCredit < 10 OR SeminarCourses < 1 OR RecommendedCredit IS NULL)
 ;
+
+CREATE VIEW CourseQueuePositions AS
+SELECT Student, RestrictedCourse AS Course, QueuePos AS Queue_Position
+FROM IsOnWaitingList 
+;
