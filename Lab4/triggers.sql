@@ -90,13 +90,13 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
       nbrSpotsLeft := (SELECT maxStudents-registredStudents);
       IF(nbrSpotsLeft >= 1) THEN
       -- Register new student
-        INSERT INTO Registrations
-          VALUES ();
+        --INSERT INTO Registrations
+          --VALUES ();
       -- Remove it from waiting list
         DELETE FROM IsOnWaitingList WHERE (QueuePos = 1);
       ELSE
             RAISE EXCEPTION 'No spots left on Course';
-      END IF
+      END IF;
     END IF;
   END;
 
