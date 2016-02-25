@@ -20,24 +20,33 @@ CREATE FUNCTION register() RETURNS trigger as $register$
 DECLARE queueLength INT;
 DECLARE isWaiting BOOLEAN;
 DECLARE isRegistered BOOLEAN;
+DECLARE hasPassed BOOLEAN;
 	BEGIN
 		queueLength := (SELECT MAX(QueuePos) FROM IsOnWaitingList 
 			WHERE NEW.CourseCode = IsOnWaitingList.RestrictedCourse);	
+		
+		/*
+		 Check if the student can be added to the course or waiting list. Uses separate IFs for greater speed.
+		 The alternative would be a IF - ELSEIF statement after these variables have been declared, but there
+		 is no need to declare the following variables if an exception should be raised.
+		*/
 		isWaiting := (SELECT EXISTS(SELECT 1 FROM IsOnWaitingList WHERE
 				NEW.Student = IsOnWaitingList.Student AND NEW.CourseCode = IsOnWaitingList.RestrictedCourse));
-		isRegistered := (SELECT EXISTS(SELECT 1 FROM RegisteredOn WHERE
-				NEW.Student = RegisteredOn.Student AND NEW.CourseCode = RegisteredOn.Course));
-		
-		-- Check if the student can be added to the course or waiting list
 		IF isWaiting THEN
 			RAISE EXCEPTION 'The student is already waiting for a place on this course';
-		ELSEIF isRegistered THEN
+		END IF;
+
+		isRegistered := (SELECT EXISTS(SELECT 1 FROM RegisteredOn WHERE
+				NEW.Student = RegisteredOn.Student AND NEW.CourseCode = RegisteredOn.Course));
+		IF isRegistered THEN
 			RAISE EXCEPTION 'The student is already registered on this course';
 		END IF;
-		
-		-- Passed this course
 
-
+		hasPassed := (SELECT EXISTS(SELECT 1 FROM HasFinished WHERE
+			NEW.Student = HasFinished.Student AND NEW.CourseCode = HasFinished.Course));
+		IF hasPassed THEN
+			RAISE EXCEPTION 'The student has already passed this course';
+		END IF;
 		-- Har inte läst förkrav 
 
 
