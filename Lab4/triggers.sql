@@ -33,19 +33,19 @@ DECLARE hasPassed BOOLEAN;
 		isWaiting := (SELECT EXISTS(SELECT 1 FROM IsOnWaitingList WHERE
 				NEW.Student = IsOnWaitingList.Student AND NEW.CourseCode = IsOnWaitingList.RestrictedCourse));
 		IF isWaiting THEN
-			RAISE EXCEPTION 'The student is already waiting for a place on this course';
+			RAISE EXCEPTION 'The student % is already waiting for a place on the course %.', NEW.Student, NEW.CourseCode;
 		END IF;
 
 		isRegistered := (SELECT EXISTS(SELECT 1 FROM RegisteredOn WHERE
 				NEW.Student = RegisteredOn.Student AND NEW.CourseCode = RegisteredOn.Course));
 		IF isRegistered THEN
-			RAISE EXCEPTION 'The student is already registered on this course';
+			RAISE EXCEPTION 'The student % is already registered on the course %.', NEW.Student, NEW.CourseCode;
 		END IF;
 
 		hasPassed := (SELECT EXISTS(SELECT 1 FROM HasFinished WHERE
 			NEW.Student = HasFinished.Student AND NEW.CourseCode = HasFinished.Course));
 		IF hasPassed THEN
-			RAISE EXCEPTION 'The student has already passed this course';
+			RAISE EXCEPTION 'The student % has already passed the course %.', NEW.Student, NEW.CourseCode;
 		END IF;
 		-- Har inte läst förkrav 
 
@@ -81,6 +81,7 @@ You need to write the triggers on the view Registrations instead of on the table
 data into, or delete data from, the underlying tables directly. But even if we lift this restriction, there is another reason 
 for not defining these triggers on the underlying tables - can you figure out why?)
 */
+
 CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
   DECLARE nbrSpotsLeft INT;
     maxStudents INT;
@@ -99,13 +100,13 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
       nbrSpotsLeft := (SELECT maxStudents-registredStudents);
       IF(nbrSpotsLeft >= 1) THEN
       -- Register new student
-        INSERT INTO Registrations
-          VALUES ();
+        --INSERT INTO Registrations
+        --  VALUES ();
       -- Remove it from waiting list
         DELETE FROM IsOnWaitingList WHERE (QueuePos = 1);
       ELSE
             RAISE EXCEPTION 'No spots left on Course';
-      END IF
+      END IF;
     END IF;
   END;
 
@@ -113,7 +114,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER unregister_check INSTEAD OF DELETE ON Registrations
   FOR EACH ROW
-  WHEN (OLD.student = student AND OLD.CourseCode = CourseCode)
+  --WHEN (OLD.student = student AND OLD.CourseCode = CourseCode)
   EXECUTE PROCEDURE unregister_check();
 
 -- GLÖM EJ: : Ändra QueuePos på övriga :D
