@@ -81,3 +81,47 @@ You need to write the triggers on the view Registrations instead of on the table
 data into, or delete data from, the underlying tables directly. But even if we lift this restriction, there is another reason 
 for not defining these triggers on the underlying tables - can you figure out why?)
 */
+CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
+  DECLARE nbrSpotsLeft INT;
+    maxStudents INT;
+    registredStudents INT;
+  BEGIN
+    -- Check if the student was properly registered
+    IF (OLD.Status = 'Waiting')
+      THEN RAISE EXCEPTION '% Is only on the waiting list', OLD.Student;
+    ELSE
+      -- Delete from course
+      DELETE FROM Registrations
+      WHERE (OLD.student = student AND OLD.CourseCode = CourseCode);
+      -- Check if there is room on the course
+      maxStudents := (SELECT MaxStudents FROM RestrictedCourses WHERE (Code = OLD.CourseCode));
+      registredStudents := (SELECT count(Student) FROM Registrations WHERE Status = 'Registred');
+      nbrSpotsLeft := (SELECT maxStudents-registredStudents);
+      IF(nbrSpotsLeft >= 1) THEN
+      -- Register new student
+        INSERT INTO Registrations
+          VALUES ();
+      -- Remove it from waiting list
+        DELETE FROM IsOnWaitingList WHERE (QueuePos = 1);
+      ELSE
+            RAISE EXCEPTION 'No spots left on Course';
+      END IF
+    END IF;
+  END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER unregister_check INSTEAD OF DELETE ON Registrations
+  FOR EACH ROW
+  WHEN (OLD.student = student AND OLD.CourseCode = CourseCode)
+  EXECUTE PROCEDURE unregister_check();
+
+-- GLÖM EJ: : Ändra QueuePos på övriga :D
+/*
+when a student unregisters from a course if the student was properly
+registered and not only on the waiting list, the first student (if any)
+in the waiting list should be registered for the course instead.
+Note: this should only be done if there is actually room on the course
+(the course might have been over-full due to an administrator overriding
+the restriction and adding students directly).
+ */
