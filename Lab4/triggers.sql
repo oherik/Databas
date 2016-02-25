@@ -23,7 +23,7 @@ DECLARE oldStudent CHAR(13);
 	BEGIN
 		queueLength := (SELECT MAX(QueuePos) FROM IsOnWaitingList 
 			WHERE NEW.CourseCode = IsOnWaitingList.RestrictedCourse);	
-		oldStudent := (SELECT oldStudent FROM IsOnWaitingList WHERE
+		oldStudent := (SELECT Student FROM IsOnWaitingList WHERE
 				NEW.Student = IsOnWaitingList.Student AND NEW.CourseCode = IsOnWaitingList.RestrictedCourse);
 		IF oldStudent = NEW.Student THEN
 			RAISE EXCEPTION 'The student is already waiting for a place on this course';
