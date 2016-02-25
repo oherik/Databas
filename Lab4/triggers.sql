@@ -19,7 +19,6 @@ ON      RegisteredOn.Course = Course.Code;
 CREATE FUNCTION register() RETURNS trigger as $register$
 DECLARE queueLength INT;
 DECLARE oldStudent CHAR(13);
-
 	BEGIN
 		queueLength := (SELECT MAX(QueuePos) FROM IsOnWaitingList 
 			WHERE NEW.CourseCode = IsOnWaitingList.RestrictedCourse);	
@@ -28,12 +27,12 @@ DECLARE oldStudent CHAR(13);
 		IF oldStudent = NEW.Student THEN
 			RAISE EXCEPTION 'The student is already waiting for a place on this course';
 		END IF;
-		IF queueLength = NULL OR queueLength = 0 THEN
-			INSERT INTO RegisteredOn(Student, Course) 
-				VALUES(NEW.Student, NEW.CourseCode);
-		ELSE
+		IF queueLength > 0 THEN
 			INSERT INTO IsOnWaitingList(Student, RestrictedCourse, QueuePos) 
 				VALUES(NEW.Student, NEW.CourseCode, queueLength+1);
+		ELSE
+			INSERT INTO RegisteredOn(Student, Course) 
+				VALUES(NEW.Student, NEW.CourseCode);
 		END IF;
 		RETURN NEW;
 	END;
