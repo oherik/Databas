@@ -98,8 +98,8 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
     queueLength INT;
   BEGIN
     -- Check if the student was properly registered
-    IF (OLD.Status = 'Waiting')
-      THEN RAISE EXCEPTION '% Is only on the waiting list', OLD.Student;
+    IF (OLD.Status = 'Waiting')THEN
+			RAISE EXCEPTION '% Is only on the waiting list', OLD.Student;
     ELSE
       -- Delete from course
       DELETE FROM RegisteredOn
@@ -115,12 +115,12 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
       ELSE
       -- Om det står någon i kö
         IF(queueLength > 0) THEN
-          INSERT INTO RegistredOn
-            VALUES (OLD.Student, OLD.Course); -- Blir fel student
+          INSERT INTO RegisteredOn
+            VALUES (
+							(SELECT Student FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode)), OLD.CourseCode);
         -- Remove it from waiting list
         DELETE FROM IsOnWaitingList WHERE (QueuePos = 1);
         END IF;
-            
       END IF;
     END IF;
     RETURN OLD;
@@ -131,6 +131,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER unregister_check INSTEAD OF DELETE ON Registrations
   FOR EACH ROW
   EXECUTE PROCEDURE unregister_check();
+
 
 -- GLÖM EJ: : Ändra QueuePos på övriga :D
 /*
