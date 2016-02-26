@@ -91,11 +91,11 @@ You need to write the triggers on the view Registrations instead of on the table
 data into, or delete data from, the underlying tables directly. But even if we lift this restriction, there is another reason 
 for not defining these triggers on the underlying tables - can you figure out why?)
 */
-
 CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
   DECLARE nbrSpotsLeft INT;
     maxStudents INT;
     registredStudents INT;
+    queueLength INT;
   BEGIN
     -- Check if the student was properly registered
     IF (OLD.Status = 'Waiting')
@@ -104,27 +104,31 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
       -- Delete from course
       DELETE FROM Registrations
       WHERE (OLD.student = student AND OLD.CourseCode = CourseCode);
+
       -- Check if there is room on the course
       maxStudents := (SELECT MaxStudents FROM RestrictedCourses WHERE (Code = OLD.CourseCode));
       registredStudents := (SELECT count(Student) FROM Registrations WHERE Status = 'Registred');
       nbrSpotsLeft := (SELECT maxStudents-registredStudents);
+      queueLength := (SELECT max(QueuePos) FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode);
       IF(nbrSpotsLeft >= 1) THEN
-      -- Register new student
-        --INSERT INTO Registrations
-        --  VALUES ();
-      -- Remove it from waiting list
+      -- Om det står någon i kö
+        IF(queueLength > 0) THEN
+          INSERT INTO RegistredOn
+            VALUES (OLD.Student, OLD.Course);
+        -- Remove it from waiting list
         DELETE FROM IsOnWaitingList WHERE (QueuePos = 1);
+        END IF;
       ELSE
             RAISE EXCEPTION 'No spots left on Course';
       END IF;
     END IF;
+    RETURN OLD;
   END;
 
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER unregister_check INSTEAD OF DELETE ON Registrations
   FOR EACH ROW
-  --WHEN (OLD.student = student AND OLD.CourseCode = CourseCode)
   EXECUTE PROCEDURE unregister_check();
 
 -- GLÖM EJ: : Ändra QueuePos på övriga :D
