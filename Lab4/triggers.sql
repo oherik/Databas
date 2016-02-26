@@ -102,24 +102,25 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
       THEN RAISE EXCEPTION '% Is only on the waiting list', OLD.Student;
     ELSE
       -- Delete from course
-      DELETE FROM Registrations
-      WHERE (OLD.student = student AND OLD.CourseCode = CourseCode);
+      DELETE FROM RegisteredOn
+      WHERE (OLD.student = Student AND OLD.CourseCode = Course);
 
       -- Check if there is room on the course
-      maxStudents := (SELECT MaxStudents FROM RestrictedCourses WHERE (Code = OLD.CourseCode));
+      maxStudents := (SELECT RestrictedCourse.MaxStudents FROM RestrictedCourse WHERE (Code = OLD.CourseCode));
       registredStudents := (SELECT count(Student) FROM Registrations WHERE Status = 'Registred');
       nbrSpotsLeft := (SELECT maxStudents-registredStudents);
       queueLength := (SELECT max(QueuePos) FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode);
-      IF(nbrSpotsLeft >= 1) THEN
+      IF(nbrSpotsLeft < 1) THEN
+      	RAISE EXCEPTION 'No spots left on Course';
+      ELSE
       -- Om det står någon i kö
         IF(queueLength > 0) THEN
           INSERT INTO RegistredOn
-            VALUES (OLD.Student, OLD.Course);
+            VALUES (OLD.Student, OLD.Course); -- Blir fel student
         -- Remove it from waiting list
         DELETE FROM IsOnWaitingList WHERE (QueuePos = 1);
         END IF;
-      ELSE
-            RAISE EXCEPTION 'No spots left on Course';
+            
       END IF;
     END IF;
     RETURN OLD;

@@ -26,5 +26,8 @@ INSERT INTO Registrations VALUES('851007-9091', 'TDA383');
 
 -- UNREGISTER
 
--- Should not throw error, this student is on the waiting list
+-- Should not throw error
+DELETE FROM Registrations WHERE Student = '721217-2204' AND CourseCode = 'TD333';
+
+-- Should throw error, this student is on the waiting list
 -- DELETE FROM Registrations WHERE Student = '620314-2044' AND CourseCode = 'TDA358';
