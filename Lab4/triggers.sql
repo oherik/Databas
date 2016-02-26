@@ -21,6 +21,8 @@ DECLARE queueLength INT;
 DECLARE isWaiting BOOLEAN;
 DECLARE isRegistered BOOLEAN;
 DECLARE hasPassed BOOLEAN;
+DECLARE hasReadPrerequisites BOOLEAN;
+
 	BEGIN
 		queueLength := (SELECT MAX(QueuePos) FROM IsOnWaitingList 
 			WHERE NEW.CourseCode = IsOnWaitingList.RestrictedCourse);	
@@ -47,8 +49,16 @@ DECLARE hasPassed BOOLEAN;
 		IF hasPassed THEN
 			RAISE EXCEPTION 'The student % has already passed the course %.', NEW.Student, NEW.CourseCode;
 		END IF;
-		-- Har inte läst förkrav 
 
+		hasReadPrerequisites := (SELECT COALESCE((SELECT false FROM
+		(SELECT RequiredCourse as Course FROM Prerequisite WHERE Prerequisite.Course = NEW.CourseCode
+		EXCEPT
+		SELECT Course FROM HasFinished WHERE HasFinished.Student = NEW.Student) as CoursesLeft
+		WHERE CoursesLeft.Course IS NOT NULL LIMIT 1), true));
+		IF NOT hasReadPrerequisites THEN
+			RAISE EXCEPTION 'The student % has not finished the prerequisite course(s) from the course %.', 
+				NEW.Student, NEW.CourseCode;
+		END IF;
 
 		-- Add the student to the appropriate table
 		IF queueLength > 0 THEN

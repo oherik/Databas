@@ -17,11 +17,14 @@ INSERT INTO Registrations VALUES('851007-9091', 'TDA383');
 --INSERT INTO Registrations VALUES('851007-9091','MVE334');
 
 -- Should throw error, the student has already passed this course
---INSERT INTO Registrations VALUES('620314-2044', 'TDA233');
+-- INSERT INTO Registrations VALUES('620314-2044', 'TDA233');
+
+-- Should throw error, the student hasn't read the prerequisute course(s)
+-- INSERT INTO Registrations VALUES('790307-6193', 'FYA344');
 
 --______________________________________________________________________________________________
 
 -- UNREGISTER
 
 -- Should not throw error, this student is on the waiting list
-DELETE FROM Registrations WHERE Student = '620314-2044' AND CourseCode = 'TDA358';
+-- DELETE FROM Registrations WHERE Student = '620314-2044' AND CourseCode = 'TDA358';
