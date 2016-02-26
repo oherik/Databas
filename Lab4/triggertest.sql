@@ -31,3 +31,7 @@ DELETE FROM Registrations WHERE Student = '721217-2204' AND CourseCode = 'TDA358
 
 -- Should throw error, this student is on the waiting list
 -- DELETE FROM Registrations WHERE Student = '620314-2044' AND CourseCode = 'TDA358';
+-- UNREGISTER
+
+-- Should not throw error
+DELETE FROM Registrations WHERE Student = '19650430-7734' AND CourseCode = 'TDA358';
