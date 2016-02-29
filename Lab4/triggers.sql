@@ -91,35 +91,40 @@ You need to write the triggers on the view Registrations instead of on the table
 data into, or delete data from, the underlying tables directly. But even if we lift this restriction, there is another reason 
 for not defining these triggers on the underlying tables - can you figure out why?)
 */
+
 CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
   DECLARE nbrSpotsLeft INT;
     maxStudents INT;
     registredStudents INT;
     queueLength INT;
+    isRegistered BOOLEAN;
   BEGIN
-    -- Check if the student was properly registered
+    -- Check if the student is on the waiting list
     IF (OLD.Status = 'Waiting')THEN
 			RAISE EXCEPTION '% Is only on the waiting list', OLD.Student;
     ELSE
       -- Delete from course
+
       DELETE FROM RegisteredOn
-      WHERE (OLD.student = Student AND OLD.CourseCode = Course);
+      WHERE (OLD.Student = Student AND OLD.CourseCode = Course);
 
       -- Check if there is room on the course
       maxStudents := (SELECT RestrictedCourse.MaxStudents FROM RestrictedCourse WHERE (Code = OLD.CourseCode));
-      registredStudents := (SELECT count(Student) FROM Registrations WHERE Status = 'Registred');
+      registredStudents := (SELECT count(Student) FROM Registrations WHERE Status = 'Registred' AND Registrations.CourseCode = OLD.CourseCode);
       nbrSpotsLeft := (SELECT maxStudents-registredStudents);
       queueLength := (SELECT max(QueuePos) FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode);
+
       IF(nbrSpotsLeft < 1) THEN
       	RAISE EXCEPTION 'No spots left on Course';
       ELSE
-      -- Om det står någon i kö
+      -- If there is someone in the queue
         IF(queueLength > 0) THEN
           INSERT INTO RegisteredOn
             VALUES (
-							(SELECT Student FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode)), OLD.CourseCode);
-        -- Remove it from waiting list
-        DELETE FROM IsOnWaitingList WHERE (QueuePos = 1);
+							(SELECT Student FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode)), OLD.CourseCode); -- Blir fel student
+          -- Remove it from waiting list
+          DELETE FROM IsOnWaitingList WHERE (QueuePos = 1);
+          -- Update the queuePositions
 					UPDATE IsOnWaitingList SET QueuePos = QueuePos - 1 WHERE IsOnWaitingList.RestrictedCourse = OLD.CourseCode;
         END IF;
       END IF;
@@ -132,7 +137,6 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER unregister_check INSTEAD OF DELETE ON Registrations
   FOR EACH ROW
   EXECUTE PROCEDURE unregister_check();
-
 
 -- GLÖM EJ: : Ändra QueuePos på övriga :D
 /*
