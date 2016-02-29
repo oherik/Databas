@@ -35,19 +35,19 @@ DECLARE hasReadPrerequisites BOOLEAN;
 		isWaiting := (SELECT EXISTS(SELECT 1 FROM IsOnWaitingList WHERE
 				NEW.Student = IsOnWaitingList.Student AND NEW.CourseCode = IsOnWaitingList.RestrictedCourse));
 		IF isWaiting THEN
-			RAISE EXCEPTION 'The student % is already waiting for a place on the course %.', NEW.Student, NEW.CourseCode;
+			RAISE NOTICE 'The student % is already waiting for a place on the course %.', NEW.Student, NEW.CourseCode;
 		END IF;
 
 		isRegistered := (SELECT EXISTS(SELECT 1 FROM RegisteredOn WHERE
 				NEW.Student = RegisteredOn.Student AND NEW.CourseCode = RegisteredOn.Course));
 		IF isRegistered THEN
-			RAISE EXCEPTION 'The student % is already registered on the course %.', NEW.Student, NEW.CourseCode;
+			RAISE NOTICE 'The student % is already registered on the course %.', NEW.Student, NEW.CourseCode;
 		END IF;
 
 		hasPassed := (SELECT EXISTS(SELECT 1 FROM HasFinished WHERE
 			NEW.Student = HasFinished.Student AND NEW.CourseCode = HasFinished.Course));
 		IF hasPassed THEN
-			RAISE EXCEPTION 'The student % has already passed the course %.', NEW.Student, NEW.CourseCode;
+			RAISE NOTICE 'The student % has already passed the course %.', NEW.Student, NEW.CourseCode;
 		END IF;
 
 		hasReadPrerequisites := (SELECT COALESCE((SELECT false FROM
@@ -56,7 +56,7 @@ DECLARE hasReadPrerequisites BOOLEAN;
 		SELECT Course FROM HasFinished WHERE HasFinished.Student = NEW.Student) as CoursesLeft
 		WHERE CoursesLeft.Course IS NOT NULL LIMIT 1), true));
 		IF NOT hasReadPrerequisites THEN
-			RAISE EXCEPTION 'The student % has not finished the prerequisite course(s) from the course %.', 
+			RAISE NOTICE 'The student % has not finished the prerequisite course(s) from the course %.',
 				NEW.Student, NEW.CourseCode;
 		END IF;
 
@@ -91,7 +91,6 @@ You need to write the triggers on the view Registrations instead of on the table
 data into, or delete data from, the underlying tables directly. But even if we lift this restriction, there is another reason 
 for not defining these triggers on the underlying tables - can you figure out why?)
 */
-
 CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
   DECLARE nbrSpotsLeft INT;
     maxStudents INT;
@@ -101,7 +100,8 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
   BEGIN
     -- Check if the student is on the waiting list
     IF (OLD.Status = 'Waiting')THEN
-			RAISE EXCEPTION '% Is only on the waiting list', OLD.Student;
+      DELETE FROM IsOnWaitingList
+      WHERE (OLD.Student = Student AND OLD.CourseCode = RestrictedCourse);
     ELSE
       -- Delete from course
 
@@ -138,7 +138,6 @@ CREATE TRIGGER unregister_check INSTEAD OF DELETE ON Registrations
   FOR EACH ROW
   EXECUTE PROCEDURE unregister_check();
 
--- GLÖM EJ: : Ändra QueuePos på övriga :D
 /*
 when a student unregisters from a course if the student was properly
 registered and not only on the waiting list, the first student (if any)
