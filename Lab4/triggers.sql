@@ -123,7 +123,7 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
             VALUES (
 							(SELECT Student FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode)), OLD.CourseCode); -- Blir fel student
           -- Remove it from waiting list
-          DELETE FROM IsOnWaitingList WHERE (QueuePos = 1);
+          DELETE FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode);
           -- Update the queuePositions
 					UPDATE IsOnWaitingList SET QueuePos = QueuePos - 1 WHERE IsOnWaitingList.RestrictedCourse = OLD.CourseCode;
         END IF;
