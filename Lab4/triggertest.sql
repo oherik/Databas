@@ -13,13 +13,9 @@ INSERT INTO Registrations VALUES('851007-9091', 'TDA383');
 
 -- UNREGISTER
 
-
-
 -- TESTCASES
 
 -- 4. Should not be registered after these calls.
 DELETE FROM Registrations WHERE Student = '19650430-7734' AND CourseCode = 'TDA358';
 DELETE FROM Registrations WHERE Student = '19650430-7734' AND CourseCode = 'TDA358';
-
-
 */
