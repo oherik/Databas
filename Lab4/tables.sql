@@ -39,7 +39,7 @@ CREATE TABLE Branch(
  );
 
 CREATE TABLE Student(
-	NationalID TEXT NOT NULL CONSTRAINT student_nationalid_not_empty CHECK(NationalID <> ''),
+	NationalID CHAR(11) NOT NULL CONSTRAINT student_nationalid_not_empty CHECK(NationalID <> ''),
 	-- TODO The constraint below doesn't work as intended
 		--CONSTRAINT student_id_not_matching_format SIMILAR TO '[^0-9]*6[^0-9]*$'
 	SchoolID TEXT NOT NULL CONSTRAINT student_schoolid_not_empty CHECK(SchoolID <> ''),
@@ -66,7 +66,7 @@ CREATE TABLE Prerequisite(
 );
 
 CREATE TABLE RegisteredOn(
-	Student TEXT NOT NULL,
+	Student CHAR(11) NOT NULL,
 	Course TEXT NOT NULL,
 	PRIMARY KEY(Student,Course),
 	FOREIGN KEY(Student) REFERENCES Student(NationalID),
@@ -74,7 +74,7 @@ CREATE TABLE RegisteredOn(
 );
 
 CREATE TABLE HasFinished(
-	Student TEXT NOT NULL,
+	Student CHAR(11) NOT NULL,
 	Course TEXT NOT NUll,
 	Grade CHAR(1) NOT NULL CONSTRAINT hasfinished_valid_grade CHECK(Grade IN ('U','3','4','5')),
 	PRIMARY KEY(Student, Course),
@@ -119,7 +119,7 @@ CREATE TABLE HasRecommended(
 );
 
 CREATE TABLE StudiesBranch(
-	Student TEXT NOT NULL,
+	Student CHAR(11) NOT NULL,
 	Branch TEXT NOT NULL,
 	Programme TEXT NOT NULL,
 	PRIMARY KEY(Student),
@@ -129,7 +129,7 @@ CREATE TABLE StudiesBranch(
 
 
 CREATE TABLE IsOnWaitingList(
-	Student TEXT NOT NULL,
+	Student CHAR(11) NOT NULL,
 	RestrictedCourse TEXT NOT NULL,
 	QueuePos INT NOT NULL CONSTRAINT IsOnWaitingList_QueuePos_Positive CHECK(QueuePos > 0),
 	PRIMARY KEY(Student, RestrictedCourse),
