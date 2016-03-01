@@ -45,20 +45,22 @@ CREATE VIEW UnreadMandatory AS
 SELECT NationalID as Student,
     Course  as Unread_Course
 FROM
-  StudentsFollowing JOIN ProgrammeHasMandatory
+  StudentsFollowing LEFT OUTER JOIN ProgrammeHasMandatory
   ON StudentsFollowing.Programme = ProgrammeHasMandatory.Programme
 UNION DISTINCT
   SELECT NationalID,
     Course as Unread_Course
   FROM
-   StudentsFollowing JOIN BranchHasMandatory
+   StudentsFollowing LEFT OUTER JOIN BranchHasMandatory
    ON StudentsFollowing.Branch = BranchHasMandatory.Branch AND StudentsFollowing.Programme = BranchHasMandatory.Programme
 
-EXCEPT
-  SELECT Student, CourseCode
-  FROM PassedCourses
+ WHERE Course NOT IN (
+    SELECT CourseCode
+    FROM PassedCourses
+    WHERE Course IS NOT NULL
+    ) 
   ORDER BY Student DESC;
-;
+
 CREATE VIEW  PathToGraduation AS(
 WITH  RecommendedCreditTable AS (
         SELECT NationalID AS StudentID,
@@ -82,7 +84,7 @@ WITH  RecommendedCreditTable AS (
         GROUP BY StudentID),
       TotalCreditTable AS (
         SELECT NationalID AS StudentID,
-              Sum(Credit) AS TotalCredit
+              coalesce(Sum(Credit),0) AS TotalCredit
         FROM    PassedCourses
               FULL OUTER JOIN StudentsFollowing
         ON      StudentsFollowing.NationalID = PassedCourses.Student
@@ -112,16 +114,16 @@ WITH  RecommendedCreditTable AS (
         SELECT
           TotalCreditTable.StudentID AS Student,
           TotalCreditTable.TotalCredit,
-          UnreadMandatoryTable.MandatoryLeft,
+          coalesce(UnreadMandatoryTable.MandatoryLeft, 0) AS MandatoryLeft,
           MathCreditTable.MathCredit,
           ResearchCreditTable.ResearchCredit,
           SeminarCoursesTable.SeminarCourses,
           RecommendedCreditTable.RecommendedCredit
-        FROM RecommendedCreditTable J UnreadMandatoryTable, MathCreditTable, ResearchCreditTable, 
+        FROM RecommendedCreditTable, UnreadMandatoryTable, MathCreditTable, ResearchCreditTable, 
         SeminarCoursesTable, TotalCreditTable
        WHERE
           TotalCreditTable.StudentID = MathCreditTable.StudentID AND
-          --TotalCreditTable.StudentID = UnreadMandatoryTable.StudentID AND
+          TotalCreditTable.StudentID = UnreadMandatoryTable.StudentID AND
           TotalCreditTable.StudentID = MathCreditTable.StudentID AND
           TotalCreditTable.StudentID = ResearchCreditTable.StudentID AND
           TotalCreditTable.StudentID = SeminarCoursesTable.StudentID AND
@@ -150,7 +152,6 @@ WHERE(
   MandatoryLeft = 0 AND RecommendedCredit >= 10 AND MathCredit >= 20 AND ResearchCredit >= 10 AND SeminarCourses >= 1)
 UNION
   SELECT Student,
-  Tv,
       TotalCredit,
       MandatoryLeft,
       MathCredit,
