@@ -13,7 +13,7 @@ INSERT INTO Registrations VALUES('851007-9091', 'TDA383');
 
 -- 1.
 \echo '------------------------------------------ \n Test 1: List info for a student \n'
-\echo '\nSelecting 620314-2044 from registrations\n'
+\echo '\nSelecting 620314-2044 from Path to graduation\n'
 SELECT * FROM PathToGraduation WHERE Student = '620314-2044';
 
 -- 2.
