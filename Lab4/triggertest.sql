@@ -52,3 +52,10 @@ DELETE FROM Registrations WHERE Student = '880121-5248' AND CourseCode = 'MED21'
 SELECT * FROM Registrations WHERE Student = '880121-5248' AND CourseCode = 'MED21';
 INSERT INTO Registrations VALUES('880121-5248','MED21');
 SELECT * FROM Registrations FULL JOIN IsOnWaitingList ON Registrations.Student = IsOnWaitingList.Student WHERE Registrations.CourseCode = 'MED21' AND (IsOnWaitingList.RestrictedCourse = 'MED21' OR Registrations.Status = 'Registred');
+
+\echo '------------------------------------------ \n Test 8: Unregister a student from an overfull course. Show that no student was moved from the queue to being registered as a result.\n'
+SELECT * FROM Registrations WHERE CourseCode = 'MDA2687';
+\echo '\nRemoving 520215-3895 to MDA2687\n'
+DELETE FROM Registrations WHERE Student = '520215-3895' AND CourseCode = 'MDA2687';
+\echo '\nShould still be one student waiting but only five registered.\n'
+SELECT * FROM Registrations WHERE CourseCode = 'MDA2687';
