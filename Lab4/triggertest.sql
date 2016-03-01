@@ -51,13 +51,13 @@ SELECT * FROM Registrations WHERE Student = '851101-1325' AND CourseCode = 'LAW4
 
 \echo '------------------------------------------ \n Test 6: Unregister the student from a restricted course that they \nare registered to, and which has at least two students in the queue. Register \nagain to the same course and show that the student gets the correct (last) position \nin the waiting list.\n'
 \echo 'Selecting the registrations and waiting list for MED21\n'
-SELECT * FROM Registrations FULL JOIN IsOnWaitingList ON Registrations.Student = IsOnWaitingList.Student WHERE Registrations.CourseCode = 'MED21' AND (IsOnWaitingList.RestrictedCourse = 'MED21' OR Registrations.Status = 'Registred');
+SELECT * FROM Registrations FULL JOIN IsOnWaitingList ON Registrations.Student = IsOnWaitingList.Student AND Registrations.CourseCode = IsOnWaitingList.RestrictedCourse WHERE Registrations.CourseCode = 'MED21' AND (IsOnWaitingList.RestrictedCourse = 'MED21' OR Registrations.Status = 'Registred');
 \echo 'Removing 520215-3895 from MED21 \n'
 DELETE FROM Registrations WHERE Student = '520215-3895' AND CourseCode = 'MED21';
 \echo 'Adding 520215-3895 to MED21 \n'
 INSERT INTO Registrations VALUES('520215-3895','MED21');
 \echo 'Selecting the registrations and waiting list for MED21\n'
-SELECT * FROM Registrations FULL JOIN IsOnWaitingList ON Registrations.Student = IsOnWaitingList.Student WHERE Registrations.CourseCode = 'MED21' AND (IsOnWaitingList.RestrictedCourse = 'MED21' OR Registrations.Status = 'Registred');
+SELECT * FROM Registrations FULL JOIN IsOnWaitingList ON Registrations.Student = IsOnWaitingList.Student AND Registrations.CourseCode = IsOnWaitingList.RestrictedCourse WHERE Registrations.CourseCode = 'MED21' AND (IsOnWaitingList.RestrictedCourse = 'MED21' OR Registrations.Status = 'Registred');
 
 
 \echo '------------------------------------------ \n Test 7: Unregister, unregister again and re-register the same student \nfor the same restricted course, and show that the student is first removed \nand then ends up in the same position as before (last).\n'
@@ -70,7 +70,7 @@ SELECT * FROM Registrations WHERE Student = '520215-3895' AND CourseCode = 'MED2
 \echo 'Adding 520215-3895 to MED21 \n'
 INSERT INTO Registrations VALUES('520215-3895','MED21');
 \echo 'Selecting the registrations and waiting list for MED21\n'
-SELECT * FROM Registrations FULL JOIN IsOnWaitingList ON Registrations.Student = IsOnWaitingList.Student WHERE Registrations.CourseCode = 'MED21' AND (IsOnWaitingList.RestrictedCourse = 'MED21' OR Registrations.Status = 'Registred');
+SELECT * FROM Registrations FULL JOIN IsOnWaitingList ON Registrations.Student = IsOnWaitingList.Student AND Registrations.CourseCode = IsOnWaitingList.RestrictedCourse WHERE Registrations.CourseCode = 'MED21' AND (IsOnWaitingList.RestrictedCourse = 'MED21' OR Registrations.Status = 'Registred');
 
 \echo '------------------------------------------ \n Test 8: Unregister a student from an overfull course. Show that no student was moved from the queue to being registered as a result.\n'
 SELECT * FROM Registrations WHERE CourseCode = 'MDA2687';
