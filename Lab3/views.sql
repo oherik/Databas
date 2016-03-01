@@ -1,3 +1,4 @@
+
 CREATE VIEW StudentsFollowing AS
 SELECT  NationalID,
         SchoolID,
@@ -128,6 +129,11 @@ GROUP BY TotalCreditTable.StudentID,
       SeminarCourses,
       RecommendedCredit
  ;
+
+--* Your "PathToGraduation" is rather complex and hard to read. You should structure it better. 
+--One way of doing that is to define helper queries (the ones you join at the end) in a WITH-expression.
+
+
 CREATE VIEW PathToGraduation AS
 SELECT Student,
       TotalCredit,
@@ -138,7 +144,7 @@ SELECT Student,
       'Qualify' AS Graduated
 FROM PathToGraduationHelp
 WHERE(
-  MandatoryLeft IS NULL AND RecommendedCredit >= 10 AND MathCredit >= 20 AND ResearchCredit >= 10 AND SeminarCourses >= 1)
+  MandatoryLeft = 0 AND RecommendedCredit >= 10 AND MathCredit >= 20 AND ResearchCredit >= 10 AND SeminarCourses >= 1)
 UNION
   SELECT Student,
       TotalCredit,
@@ -150,5 +156,5 @@ UNION
 FROM PathToGraduationHelp
 WHERE(
   MandatoryLeft > 0 OR RecommendedCredit < 10 OR MathCredit < 20
-  OR ResearchCredit < 10 OR SeminarCourses < 1 OR RecommendedCredit IS NULL)
+  OR ResearchCredit < 10 OR SeminarCourses < 1 OR RecommendedCredit = 0)
 ;
