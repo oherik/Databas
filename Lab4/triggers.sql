@@ -28,45 +28,38 @@ DECLARE hasReadPrerequisites BOOLEAN;
 			WHERE NEW.CourseCode = IsOnWaitingList.RestrictedCourse);	
 		
 		/*
-		 Check if the student can be added to the course or waiting list. Uses separate IFs for greater speed.
-		 The alternative would be a IF - ELSEIF statement after these variables have been declared, but there
-		 is no need to declare the following variables if an exception should be raised.
-		*/
+		 Check if the student can be added to the course or waiting list. 
+		 */
 		isWaiting := (SELECT EXISTS(SELECT 1 FROM IsOnWaitingList WHERE
 				NEW.Student = IsOnWaitingList.Student AND NEW.CourseCode = IsOnWaitingList.RestrictedCourse));
-		IF isWaiting THEN
-			RAISE NOTICE 'The student % is already waiting for a place on the course %.', NEW.Student, NEW.CourseCode;
-		END IF;
-
 		isRegistered := (SELECT EXISTS(SELECT 1 FROM RegisteredOn WHERE
 				NEW.Student = RegisteredOn.Student AND NEW.CourseCode = RegisteredOn.Course));
-		IF isRegistered THEN
-			RAISE NOTICE 'The student % is already registered on the course %.', NEW.Student, NEW.CourseCode;
-		END IF;
-
 		hasPassed := (SELECT EXISTS(SELECT 1 FROM HasFinished WHERE
 			NEW.Student = HasFinished.Student AND NEW.CourseCode = HasFinished.Course));
-		IF hasPassed THEN
-			RAISE NOTICE 'The student % has already passed the course %.', NEW.Student, NEW.CourseCode;
-		END IF;
-
 		hasReadPrerequisites := (SELECT COALESCE((SELECT false FROM
 		(SELECT RequiredCourse as Course FROM Prerequisite WHERE Prerequisite.Course = NEW.CourseCode
 		EXCEPT
 		SELECT Course FROM HasFinished WHERE HasFinished.Student = NEW.Student) as CoursesLeft
 		WHERE CoursesLeft.Course IS NOT NULL LIMIT 1), true));
-		IF NOT hasReadPrerequisites THEN
+		
+		IF isRegistered THEN
+			RAISE NOTICE 'The student % is already registered on the course %.', NEW.Student, NEW.CourseCode;
+		ELSEIF isWaiting THEN
+			RAISE NOTICE 'The student % is already waiting for a place on the course %.', NEW.Student, NEW.CourseCode;
+		ELSEIF hasPassed THEN
+			RAISE NOTICE 'The student % has already passed the course %.', NEW.Student, NEW.CourseCode;
+		ELSEIF NOT hasReadPrerequisites THEN
 			RAISE NOTICE 'The student % has not finished the prerequisite course(s) from the course %.',
 				NEW.Student, NEW.CourseCode;
-		END IF;
-
-		-- Add the student to the appropriate table
-		IF queueLength > 0 THEN
-			INSERT INTO IsOnWaitingList(Student, RestrictedCourse, QueuePos) 
-				VALUES(NEW.Student, NEW.CourseCode, queueLength+1);
 		ELSE
-			INSERT INTO RegisteredOn(Student, Course) 
-				VALUES(NEW.Student, NEW.CourseCode);
+		-- Add the student to the appropriate table
+			IF queueLength > 0 THEN
+				INSERT INTO IsOnWaitingList(Student, RestrictedCourse, QueuePos) 
+					VALUES(NEW.Student, NEW.CourseCode, queueLength+1);
+			ELSE
+				INSERT INTO RegisteredOn(Student, Course) 
+					VALUES(NEW.Student, NEW.CourseCode);
+			END IF;
 		END IF;
 		RETURN NEW;
 	END;
