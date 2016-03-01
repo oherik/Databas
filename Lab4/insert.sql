@@ -165,11 +165,11 @@ VALUES
 ('780219-8973','mathog','Mats Högberg','Electrical Engineering'),
 ('790307-6193','bjohed','Björn Hedström','Nano-biotechnology'),
 ('841114-9571','toball','Tobias Alldén','Computer Science'),
-('19871229-8424','linhan','Linn Hansen','Political Science'),
-('19621217-7049','lovjab','Lovisa Jäberg','Liberal Arts'),
-('19721104-4396','jonlin','Jonas Lindberg','Liberal Arts'),
-('19851101-1325','aleket','Alexandra Kettil','Technical Design'),
-('19650430-7734','danlam','Danny Lam','Juridics')
+('871229-8424','linhan','Linn Hansen','Political Science'),
+('621217-7049','lovjab','Lovisa Jäberg','Liberal Arts'),
+('721104-4396','jonlin','Jonas Lindberg','Liberal Arts'),
+('851101-1325','aleket','Alexandra Kettil','Technical Design'),
+('650430-7734','danlam','Danny Lam','Juridics')
 ;
 
 INSERT INTO Prerequisite
@@ -211,38 +211,38 @@ VALUES
 ('721217-2204','TD333'),
 ('790307-6193','MDA2687'),
 ('841114-9571','TDA233'),
-('19871229-8424','POL34'),
-('19721104-4396','LAW4444'),
-('19851101-1325','FYA344'),
-('19650430-7734','LAW3444'),
-('19650430-7734','TDA358'),
-('19650430-7734','MED21'),
-('19851101-1325','MED21'),
-('19721104-4396','MED21'),
-('19871229-8424','MED21'),
+('871229-8424','POL34'),
+('721104-4396','LAW4444'),
+('851101-1325','FYA344'),
+('650430-7734','LAW3444'),
+('650430-7734','TDA358'),
+('650430-7734','MED21'),
+('851101-1325','MED21'),
+('721104-4396','MED21'),
+('871229-8424','MED21'),
 ('841114-9571','MED21'),
 ('880121-5248','MED21'),
 ('721217-2204','MED21'),
 ('721217-2204','MDA2687'),
 ('880121-5248','MDA2687'),
 ('841114-9571','MDA2687'),
-('19871229-8424','MDA2687')
+('871229-8424','MDA2687')
 
 ;
 
 INSERT INTO HasFinished
 VALUES
 -- Should throw errors:
--- ('19721104-4396','LAW3444', 'I'),
+-- ('721104-4396','LAW3444', 'I'),
 -- ('620314-2044', 'TD333', 4),
 -- ('Non-existing','LAW3444', '3'),
--- ('19721104-4396','Non-existing', '3'),
+-- ('721104-4396','Non-existing', '3'),
 -- ('','LAW3444', '3'),
--- ('19721104-4396','', '3'),
--- ('19721104-4396','LAW3444', ''),
+-- ('721104-4396','', '3'),
+-- ('721104-4396','LAW3444', ''),
 -- Good values:
-('19721104-4396','LAW3444', '3'),
-('19851101-1325','TD333', '5'),
+('721104-4396','LAW3444', '3'),
+('851101-1325','TD333', '5'),
 ('560216-2579','MVE343', '4'),
 ('560216-2579','MVE334', '3'),
 ('780219-8973','MVE343', '5'),
@@ -254,8 +254,8 @@ VALUES
 ('620314-2044', 'DAT321', '3'),
 ('620314-2044', 'TDA233', '3'),
 ('620314-2044', 'TDA358', '3'),
-('19650430-7734','LAW3444', '3'),
-('19650430-7734','DAT321', '3')
+('650430-7734','LAW3444', '3'),
+('650430-7734','DAT321', '3')
 ;
 
 INSERT INTO HostedBy
@@ -337,10 +337,10 @@ VALUES
 ('780219-8973','CPU construction', 'Electrical Engineering'),
 ('790307-6193','Nanorobotics', 'Nano-biotechnology'),
 ('841114-9571','Algorithms', 'Computer Science'),
-('19871229-8424','Political Theory', 'Political Science'),
-('19621217-7049','History', 'Liberal Arts'),
-('19851101-1325','User Interfaces', 'Technical Design'),
-('19650430-7734','International Law', 'Juridics')
+('871229-8424','Political Theory', 'Political Science'),
+('621217-7049','History', 'Liberal Arts'),
+('851101-1325','User Interfaces', 'Technical Design'),
+('650430-7734','International Law', 'Juridics')
 ;
 
 INSERT INTO IsOnWaitingList
@@ -355,9 +355,9 @@ VALUES
 -- Good values:
 ('851007-9091','TDA358',1),
 ('620314-2044','TDA358',4),
-('19621217-7049','LAW4444', 1),
+('621217-7049','LAW4444', 1),
 ('790307-6193', 'MED21',1),
-('19721104-4396','MDA2687',1)
+('721104-4396','MDA2687',1)
 ;
 
 INSERT INTO HasClassification

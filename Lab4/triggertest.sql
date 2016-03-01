@@ -34,19 +34,19 @@ SELECT * FROM Registrations WHERE CourseCode = 'POL227';
 
 -- 4.
 \echo '------------------------------------------ \n Test 4: Should not be registered after these calls.\n'
-\echo '\nDeleting 19650430-7734 from TDA358\n'
-DELETE FROM Registrations WHERE Student = '19650430-7734' AND CourseCode = 'TDA358';
-\echo '\nDeleting 19650430-7734 from TDA358\n'
-DELETE FROM Registrations WHERE Student = '19650430-7734' AND CourseCode = 'TDA358';
-\echo '\nSelecting 19650430-7734 from registrations\n'
-SELECT * FROM Registrations WHERE Student = '19650430-7734' AND CourseCode = 'TDA358';
+\echo '\nDeleting 650430-7734 from TDA358\n'
+DELETE FROM Registrations WHERE Student = '650430-7734' AND CourseCode = 'TDA358';
+\echo '\nDeleting 650430-7734 from TDA358\n'
+DELETE FROM Registrations WHERE Student = '650430-7734' AND CourseCode = 'TDA358';
+\echo '\nSelecting 650430-7734 from registrations\n'
+SELECT * FROM Registrations WHERE Student = '650430-7734' AND CourseCode = 'TDA358';
 
 -- 5.
 \echo '------------------------------------------ \n Test 5: Register the student for a course that they don’t have \n the prerequisites for, and show that the registration doesn’t go through.\n'
-\echo 'Adding 19851101-1325 to LAW4444\n'
-INSERT INTO Registrations VALUES ('19851101-1325', 'LAW4444');
-\echo 'Selecting student 19851101-1325, course LAW4444 from registrations\n'
-SELECT * FROM Registrations WHERE Student = '19851101-1325' AND CourseCode = 'LAW4444';
+\echo 'Adding 851101-1325 to LAW4444\n'
+INSERT INTO Registrations VALUES ('851101-1325', 'LAW4444');
+\echo 'Selecting student 851101-1325, course LAW4444 from registrations\n'
+SELECT * FROM Registrations WHERE Student = '851101-1325' AND CourseCode = 'LAW4444';
 
 
 \echo '------------------------------------------ \n Test 6: Unregister the student from a restricted course that they \nare registered to, and which has at least two students in the queue. Register \nagain to the same course and show that the student gets the correct (last) position \nin the waiting list.\n'
