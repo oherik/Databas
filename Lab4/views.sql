@@ -62,14 +62,6 @@ EXCEPT
   FROM PassedCourses
   ORDER BY Student DESC;
 ;
-CREATE VIEW SCT AS
-        SELECT NationalID AS StudentID,
-               coalesce(Count(Unread_Course), 0) AS MandatoryLeft
-        FROM    UnreadMandatory
-        FULL OUTER JOIN StudentsFollowing
-        ON StudentsFollowing.NationalID = UnreadMandatory.Student
-        GROUP BY StudentID;
-
 CREATE VIEW  PathToGraduation AS(
 WITH  RecommendedCreditTable AS (
         SELECT NationalID AS StudentID,
