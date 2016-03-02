@@ -42,58 +42,54 @@ ON      HasFinished.Course = Course.Code
 WHERE   Grade <> 'U';
 
 CREATE VIEW UnreadMandatory AS
-SELECT NationalID as Student,
+SELECT Student,
+    Unread_Course
+FROM(
+  SELECT NationalID as Student,
     Course  as Unread_Course
-FROM
-  StudentsFollowing LEFT OUTER JOIN ProgrammeHasMandatory
+  FROM
+  StudentsFollowing JOIN ProgrammeHasMandatory
   ON StudentsFollowing.Programme = ProgrammeHasMandatory.Programme
 UNION DISTINCT
-  SELECT NationalID,
+  SELECT NationalID as Student,
     Course as Unread_Course
   FROM
-   StudentsFollowing LEFT OUTER JOIN BranchHasMandatory
-   ON StudentsFollowing.Branch = BranchHasMandatory.Branch AND StudentsFollowing.Programme = BranchHasMandatory.Programme
-
- WHERE Course NOT IN (
-    SELECT CourseCode
-    FROM PassedCourses
-    WHERE Course IS NOT NULL
-    ) 
+   StudentsFollowing JOIN BranchHasMandatory
+   ON StudentsFollowing.Branch = BranchHasMandatory.Branch AND StudentsFollowing.Programme = BranchHasMandatory.Programme)
+  AS MandatoryHelp
+EXCEPT
+  SELECT Student, CourseCode as Unread_Course
+  FROM PassedCourses
   ORDER BY Student DESC;
+;
+CREATE VIEW SCT AS
+        SELECT NationalID AS StudentID,
+               coalesce(Count(Unread_Course), 0) AS MandatoryLeft
+        FROM    UnreadMandatory
+        FULL OUTER JOIN StudentsFollowing
+        ON StudentsFollowing.NationalID = UnreadMandatory.Student
+        GROUP BY StudentID;
 
 CREATE VIEW  PathToGraduation AS(
 WITH  RecommendedCreditTable AS (
         SELECT NationalID AS StudentID,
-              Sum(Credit) AS RecommendedCredit
+              coalesce(Sum(Credit), 0) AS RecommendedCredit
         FROM    PassedCourses
-        LEFT OUTER JOIN HasRecommended
+        Inner JOIN HasRecommended
         ON      HasRecommended.Course = PassedCourses.CourseCode
-        JOIN StudentsFollowing
-        ON StudentsFollowing.NationalID = PassedCourses.Student
-        WHERE (HasRecommended.Branch = StudentsFollowing.Branch 
+        RIGHT OUTER JOIN StudentsFollowing
+        ON StudentsFollowing.NationalID = PassedCourses.Student AND
+          HasRecommended.Branch = StudentsFollowing.Branch
           AND HasRecommended.Programme = StudentsFollowing.Programme
-          AND PassedCourses.CourseCode = HasRecommended.Course)
         GROUP BY StudentID),
-      StudentCourses AS (
-        SELECT NationalID AS StudentID,
-                CourseCode,
-                Credit 
-                FROM
-          Student LEFT OUTER JOIN
-          PassedCourses
-        ON Student.NationalID = PassedCourses.Student
-        ),
-      ResearchCourses AS (
-        SELECT Course FROM 
-          HasClassification
-        WHERE HasClassification.Classification = 'Research'),
       ResearchCreditTable AS (
-        SELECT  StudentID,
-              coalesce(sum(Credit),0) AS ResearchCredit
-        FROM
-          StudentCourses  LEFT OUTER JOIN ResearchCourses
-        ON      StudentCourses.CourseCode = ResearchCourses.Course
-        
+        SELECT  NationalID AS StudentID,
+                coalesce(sum(Credit), 0) AS ResearchCredit
+        FROM    PassedCourses
+        INNER  JOIN HasClassification
+        ON      HasClassification.Course = PassedCourses.CourseCode AND HasClassification.Classification = 'Research'
+        RIGHT OUTER JOIN StudentsFollowing
+        ON      StudentsFollowing.NationalID = PassedCourses.Student
         GROUP BY StudentID),
       TotalCreditTable AS (
         SELECT NationalID AS StudentID,
@@ -103,67 +99,64 @@ WITH  RecommendedCreditTable AS (
         ON      StudentsFollowing.NationalID = PassedCourses.Student
         GROUP BY StudentID),
       SeminarCoursesTable AS (
-        SELECT Student AS StudentID,
-                coalesce(Count(Course),0) AS SeminarCourses
+        SELECT NationalID AS StudentID,
+                coalesce(Count(Course), 0) AS SeminarCourses
         FROM    PassedCourses
-        LEFT OUTER JOIN HasClassification
-        ON      HasClassification.Course = PassedCourses.CourseCode
-        WHERE HasClassification.Classification = 'Seminar'
+        INNER  JOIN HasClassification
+        ON      HasClassification.Course = PassedCourses.CourseCode AND HasClassification.Classification = 'Seminar'
+        RIGHT OUTER JOIN StudentsFollowing
+        ON      StudentsFollowing.NationalID = PassedCourses.Student
         GROUP BY StudentID),
       UnreadMandatoryTable AS (
-        SELECT UnreadMandatory.Student AS StudentID,
-              coalesce(Count(Unread_Course),0) AS MandatoryLeft
+        SELECT NationalID AS StudentID,
+               coalesce(Count(Unread_Course), 0) AS MandatoryLeft
         FROM    UnreadMandatory
-        GROUP BY StudentID), 
+        FULL OUTER JOIN StudentsFollowing
+        ON StudentsFollowing.NationalID = UnreadMandatory.Student
+        GROUP BY StudentID),
       MathCreditTable AS (
-        SELECT Student AS StudentID,
-              coalesce(sum(Credit),0) AS MathCredit
+        SELECT NationalID AS StudentID,
+               coalesce(sum(Credit), 0) AS MathCredit
         FROM    PassedCourses
-        FULL OUTER JOIN HasClassification
-        ON      HasClassification.Course = PassedCourses.CourseCode
-        WHERE HasClassification.Classification = 'Mathematical'
+        INNER  JOIN HasClassification
+        ON      HasClassification.Course = PassedCourses.CourseCode AND HasClassification.Classification = 'Mathematical'
+        RIGHT OUTER JOIN StudentsFollowing
+        ON      StudentsFollowing.NationalID = PassedCourses.Student
         GROUP BY StudentID),
       PathToGraduationHelp AS(
         SELECT
           TotalCreditTable.StudentID AS Student,
-
           TotalCreditTable.TotalCredit,
-          UnreadMandatoryTable.MandatoryLeft AS MandatoryLeft,
+          MandatoryLeft,
           MathCreditTable.MathCredit,
-          ResearchCreditTable.StudentID AS RS,
-          ResearchCreditTable.ResearchCredit,
+          ResearchCreditTable.ResearchCredit AS ResearchCredit,
           SeminarCoursesTable.SeminarCourses,
           RecommendedCreditTable.RecommendedCredit
-        FROM RecommendedCreditTable, UnreadMandatoryTable, MathCreditTable, ResearchCreditTable, 
+        FROM RecommendedCreditTable, UnreadMandatoryTable, MathCreditTable, ResearchCreditTable,
         SeminarCoursesTable, TotalCreditTable
+
        WHERE
-         --TotalCreditTable.StudentID = MathCreditTable.StudentID AND
-          TotalCreditTable.StudentID = UnreadMandatoryTable.StudentID  
-          -- AND
-          --otalCreditTable.StudentID = MathCreditTable.StudentID AND
-        -- TotalCreditTable.StudentID = ResearchCreditTable.StudentID --AND
-          --TotalCreditTable.StudentID = SeminarCoursesTable.StudentID AND
-         -- TotalCreditTable.StudentID = RecommendedCreditTable.StudentID
+          TotalCreditTable.StudentID = UnreadMandatoryTable.StudentID AND
+          TotalCreditTable.StudentID = MathCreditTable.StudentID AND
+          TotalCreditTable.StudentID = ResearchCreditTable.StudentID AND
+          TotalCreditTable.StudentID = SeminarCoursesTable.StudentID AND
+          TotalCreditTable.StudentID = RecommendedCreditTable.StudentID
+
        GROUP BY Student,
        TotalCredit,
       MandatoryLeft,
       MathCredit,
-      RS,
       ResearchCredit,
       SeminarCourses,
       RecommendedCredit
        )
-
---* Your "PathToGraduation" is rather complex and hard to read. You should structure it better. 
---One way of doing that is to define helper queries (the ones you join at the end) in a WITH-expression.
-
 SELECT Student,
       TotalCredit,
       MandatoryLeft,
       MathCredit,
-      RS,
       ResearchCredit,
       SeminarCourses,
+      RecommendedCredit,
       'Qualify' AS Graduated
 FROM PathToGraduationHelp
 WHERE(
@@ -173,9 +166,9 @@ UNION
       TotalCredit,
       MandatoryLeft,
       MathCredit,
-      RS,
       ResearchCredit,
       SeminarCourses,
+      RecommendedCredit,
       'Not Qualified' AS Graduated
 FROM PathToGraduationHelp
 WHERE(
