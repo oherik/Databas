@@ -20,7 +20,7 @@ CREATE TABLE Course(
 	Code TEXT NOT NULL CONSTRAINT course_code_not_empty CHECK(Code <> ''),
 	Credit FLOAT NOT NULL CONSTRAINT course_credit_positive CHECK(Credit > 0),
 	Name TEXT NOT NULL CONSTRAINT course_name_not_empty CHECK(Name <> ''),
-	Department CHAR(4) NOT NULL CONSTRAINT course_department_not_empty CHECK(Department <> '    '),
+	Department CHAR(4),
 	PRIMARY KEY(Code),
 	FOREIGN KEY(Department)	REFERENCES Department(Abbreviation)
 );
@@ -33,18 +33,18 @@ CREATE TABLE RestrictedCourse(
 
 CREATE TABLE Branch(
 	Name TEXT NOT NULL CONSTRAINT branch_name_not_empty CHECK(Name <> ''),
-	Programme TEXT NOT NULL,
+	Programme TEXT,
 	PRIMARY KEY(Name, Programme),
 	FOREIGN KEY(Programme) REFERENCES Programme(Name)
  );
 
 CREATE TABLE Student(
-	NationalID CHAR(11) NOT NULL CONSTRAINT student_nationalid_not_empty CHECK(NationalID <> ''),
+	NationalID CHAR(13) NOT NULL CONSTRAINT student_nationalid_not_empty CHECK(NationalID <> ''), 
 	-- TODO The constraint below doesn't work as intended
 		--CONSTRAINT student_id_not_matching_format SIMILAR TO '[^0-9]*6[^0-9]*$'
 	SchoolID TEXT NOT NULL CONSTRAINT student_schoolid_not_empty CHECK(SchoolID <> ''),
 	Name TEXT NOT NULL CONSTRAINT student_name_not_empty CHECK(Name <> ''),
-	Programme TEXT NOT NUll,
+	Programme TEXT,
 	PRIMARY KEY(NationalID),
 	UNIQUE(SchoolID),
 	UNIQUE(NationalID, Programme),  -- TODO: Osäker på detta, kolla upp
@@ -58,24 +58,24 @@ CREATE TABLE Student(
 
 
 CREATE TABLE Prerequisite(
-	Course TEXT NOT NULL,
-	RequiredCourse TEXT NOT NULL,
+	Course TEXT,
+	RequiredCourse TEXT,
 	PRIMARY KEY(Course, RequiredCourse),
 	FOREIGN KEY(Course) REFERENCES Course(Code),
 	FOREIGN KEY(RequiredCourse) REFERENCES Course(Code)
 );
 
 CREATE TABLE RegisteredOn(
-	Student CHAR(11) NOT NULL,
-	Course TEXT NOT NULL,
+	Student CHAR(13),
+	Course TEXT,
 	PRIMARY KEY(Student,Course),
 	FOREIGN KEY(Student) REFERENCES Student(NationalID),
 	FOREIGN KEY(Course) REFERENCES Course(Code)
 );
 
 CREATE TABLE HasFinished(
-	Student CHAR(11) NOT NULL,
-	Course TEXT NOT NUll,
+	Student CHAR(13),
+	Course TEXT,
 	Grade CHAR(1) NOT NULL CONSTRAINT hasfinished_valid_grade CHECK(Grade IN ('U','3','4','5')),
 	PRIMARY KEY(Student, Course),
 	FOREIGN KEY(Student) REFERENCES Student(NationalID),
@@ -83,16 +83,16 @@ CREATE TABLE HasFinished(
 );
 
 CREATE TABLE HostedBy(
-	Programme TEXT NOT NULL,
-	Department CHAR(4) NOT NULL,
+	Programme TEXT,
+	Department CHAR(4),
 	PRIMARY KEY(Programme, Department),
 	FOREIGN KEY(Programme) REFERENCES Programme(Name),
 	FOREIGN KEy(Department) REFERENCES Department(Abbreviation)
 );
 
 CREATE TABLE ProgrammeHasMandatory(
-	Programme TEXT NOT NULL,
-	Course TEXT NOT NULL,
+	Programme TEXT,
+	Course TEXT,
 	PRIMARY KEY(Programme, Course),
 	FOREIGN KEY(Programme) REFERENCES Programme(Name),
 	FOREIGN KEY(Course) REFERENCES Course(Code)
@@ -100,9 +100,9 @@ CREATE TABLE ProgrammeHasMandatory(
 
 
 CREATE TABLE BranchHasMandatory(
-	Branch TEXT NOT NULL,
-	Programme TEXT NOT NULL,
-	Course TEXT NOT NULL,
+	Branch TEXT,
+	Programme TEXT,
+	Course TEXT,
 	PRIMARY KEY(Branch, Programme, Course),
 	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
 	FOREIGN KEY(Course) REFERENCES Course(Code)
@@ -110,18 +110,18 @@ CREATE TABLE BranchHasMandatory(
 
 
 CREATE TABLE HasRecommended(
-	Branch TEXT NOT NULL,
-	Programme TEXT NOT NULL,
-	Course TEXT NOT NULL,
+	Branch TEXT,
+	Programme TEXT,
+	Course TEXT,
 	PRIMARY KEY(Branch, Programme, Course),
 	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
 	FOREIGN KEY(Course) REFERENCES Course(Code)
 );
 
 CREATE TABLE StudiesBranch(
-	Student CHAR(11) NOT NULL,
-	Branch TEXT NOT NULL,
-	Programme TEXT NOT NULL,
+	Student CHAR(13),
+	Branch TEXT,
+	Programme TEXT,
 	PRIMARY KEY(Student),
 	FOREIGN KEY(Branch, Programme) REFERENCES Branch(Name, Programme),
 	FOREIGN KEY(Student, Programme) REFERENCES Student(NationalID, Programme)
@@ -129,8 +129,8 @@ CREATE TABLE StudiesBranch(
 
 
 CREATE TABLE IsOnWaitingList(
-	Student CHAR(11) NOT NULL,
-	RestrictedCourse TEXT NOT NULL,
+	Student CHAR(13),
+	RestrictedCourse TEXT,
 	QueuePos INT NOT NULL CONSTRAINT IsOnWaitingList_QueuePos_Positive CHECK(QueuePos > 0),
 	PRIMARY KEY(Student, RestrictedCourse),
 	FOREIGN KEY(RestrictedCourse) REFERENCES RestrictedCourse(Code),
@@ -139,8 +139,8 @@ CREATE TABLE IsOnWaitingList(
 );
 
 CREATE TABLE HasClassification(
-	Course TEXT NOT NULL,
-	Classification TEXT NOT NULL,
+	Course TEXT,
+	Classification TEXT,
 	PRIMARY KEY(Course, Classification),
 	FOREIGN KEY(Course) REFERENCES Course(Code),
 	FOREIGN KEY(Classification) REFERENCES Classification(Name)
