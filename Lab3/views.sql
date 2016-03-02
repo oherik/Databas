@@ -74,13 +74,26 @@ WITH  RecommendedCreditTable AS (
           AND HasRecommended.Programme = StudentsFollowing.Programme
           AND PassedCourses.CourseCode = HasRecommended.Course)
         GROUP BY StudentID),
+      StudentCourses AS (
+        SELECT NationalID AS StudentID,
+                CourseCode,
+                Credit 
+                FROM
+          Student LEFT OUTER JOIN
+          PassedCourses
+        ON Student.NationalID = PassedCourses.Student
+        ),
+      ResearchCourses AS (
+        SELECT Course FROM 
+          HasClassification
+        WHERE HasClassification.Classification = 'Research'),
       ResearchCreditTable AS (
-        SELECT Student AS StudentID,
-              sum(Credit) AS ResearchCredit
-        FROM    PassedCourses
-        LEFT OUTER JOIN HasClassification
-        ON      HasClassification.Course = PassedCourses.CourseCode
-        WHERE HasClassification.Classification = 'Research'
+        SELECT  StudentID,
+              coalesce(sum(Credit),0) AS ResearchCredit
+        FROM
+          StudentCourses  LEFT OUTER JOIN ResearchCourses
+        ON      StudentCourses.CourseCode = ResearchCourses.Course
+        
         GROUP BY StudentID),
       TotalCreditTable AS (
         SELECT NationalID AS StudentID,
@@ -91,7 +104,7 @@ WITH  RecommendedCreditTable AS (
         GROUP BY StudentID),
       SeminarCoursesTable AS (
         SELECT Student AS StudentID,
-                Count(Course) AS SeminarCourses
+                coalesce(Count(Course),0) AS SeminarCourses
         FROM    PassedCourses
         LEFT OUTER JOIN HasClassification
         ON      HasClassification.Course = PassedCourses.CourseCode
@@ -99,12 +112,12 @@ WITH  RecommendedCreditTable AS (
         GROUP BY StudentID),
       UnreadMandatoryTable AS (
         SELECT UnreadMandatory.Student AS StudentID,
-              Count(Unread_Course) AS MandatoryLeft
+              coalesce(Count(Unread_Course),0) AS MandatoryLeft
         FROM    UnreadMandatory
         GROUP BY StudentID), 
       MathCreditTable AS (
         SELECT Student AS StudentID,
-              sum(Credit) AS MathCredit
+              coalesce(sum(Credit),0) AS MathCredit
         FROM    PassedCourses
         FULL OUTER JOIN HasClassification
         ON      HasClassification.Course = PassedCourses.CourseCode
@@ -113,25 +126,29 @@ WITH  RecommendedCreditTable AS (
       PathToGraduationHelp AS(
         SELECT
           TotalCreditTable.StudentID AS Student,
+
           TotalCreditTable.TotalCredit,
-          coalesce(UnreadMandatoryTable.MandatoryLeft, 0) AS MandatoryLeft,
+          UnreadMandatoryTable.MandatoryLeft AS MandatoryLeft,
           MathCreditTable.MathCredit,
+          ResearchCreditTable.StudentID AS RS,
           ResearchCreditTable.ResearchCredit,
           SeminarCoursesTable.SeminarCourses,
           RecommendedCreditTable.RecommendedCredit
         FROM RecommendedCreditTable, UnreadMandatoryTable, MathCreditTable, ResearchCreditTable, 
         SeminarCoursesTable, TotalCreditTable
        WHERE
-          TotalCreditTable.StudentID = MathCreditTable.StudentID AND
-          TotalCreditTable.StudentID = UnreadMandatoryTable.StudentID AND
-          TotalCreditTable.StudentID = MathCreditTable.StudentID AND
-          TotalCreditTable.StudentID = ResearchCreditTable.StudentID AND
-          TotalCreditTable.StudentID = SeminarCoursesTable.StudentID AND
-          TotalCreditTable.StudentID = RecommendedCreditTable.StudentID
+         --TotalCreditTable.StudentID = MathCreditTable.StudentID AND
+          TotalCreditTable.StudentID = UnreadMandatoryTable.StudentID  
+          -- AND
+          --otalCreditTable.StudentID = MathCreditTable.StudentID AND
+        -- TotalCreditTable.StudentID = ResearchCreditTable.StudentID --AND
+          --TotalCreditTable.StudentID = SeminarCoursesTable.StudentID AND
+         -- TotalCreditTable.StudentID = RecommendedCreditTable.StudentID
        GROUP BY Student,
        TotalCredit,
       MandatoryLeft,
       MathCredit,
+      RS,
       ResearchCredit,
       SeminarCourses,
       RecommendedCredit
@@ -144,6 +161,7 @@ SELECT Student,
       TotalCredit,
       MandatoryLeft,
       MathCredit,
+      RS,
       ResearchCredit,
       SeminarCourses,
       'Qualify' AS Graduated
@@ -155,6 +173,7 @@ UNION
       TotalCredit,
       MandatoryLeft,
       MathCredit,
+      RS,
       ResearchCredit,
       SeminarCourses,
       'Not Qualified' AS Graduated
