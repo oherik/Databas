@@ -87,10 +87,12 @@ public class StudentPortal
         st.executeQuery("SELECT * FROM StudentsFollowing WHERE NationalID = '" + student + "'") ;
 
         while (rs.next()) { // loop through all results *
-            System.out.println("Name: " +rs.getString(3));
-            System.out.println("StudentID: " +rs.getString(2));
-            System.out.println("Line: " + rs.getString(4));
-            System.out.println("Branch: " +rs.getString(5));
+            System.out.println("Name: " +rs.getString("Name"));
+            System.out.println("StudentID: " +rs.getString("SchoolID"));
+            System.out.println("Line: " + rs.getString("Programme"));
+            String branch = rs.getString("Branch");
+            if(branch != null && !branch.equals(""))
+                System.out.println("Branch:\t" + branch);
             System.out.println("");
 
         }
@@ -99,8 +101,8 @@ public class StudentPortal
         rs = st.executeQuery("SELECT * FROM FinishedCourses WHERE Student = '" + student + "'") ;
 
         while (rs.next()) { // loop through all results *
-            System.out.println(" " +rs.getString(3) + " (" + rs.getString(2) + "), " + rs.getString(5) + "p: " + rs.getString(4) );
-        }
+            System.out.println(" " + rs.getString("CourseName") + " (" + rs.getString("CourseCode") + "), " +
+                    rs.getString("Credit") +"p: "+ rs.getString("Grade"));        }
         rs.close(); // get ready for new query *
         System.out.println("");
         System.out.println("Registered courses (name (code): status):");
@@ -108,9 +110,9 @@ public class StudentPortal
 
         while (rs.next()) { // loop through all results *
             if(rs.getString(4).equals("Waiting")){
-                System.out.println(" " +rs.getString(3) + " (" + rs.getString(2) + "): " + rs.getString(4) + " as nr " + rs.getString(7) );
+                System.out.println(" " +rs.getString("CourseName") + " (" + rs.getString("CourseCode") + "): " + rs.getString("Status") + " as nr " + rs.getString(7) );
             } else{
-                System.out.println(" " +rs.getString(3) + " (" + rs.getString(2) + "): " + rs.getString(4));
+                System.out.println(" " +rs.getString("CourseName") + " (" + rs.getString("CourseCode") + "): " + rs.getString("Status"));
             }
         }
         rs.close(); // get ready for new query *
