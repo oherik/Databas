@@ -151,34 +151,33 @@ public class StudentPortal
         st.close();
     }
 
-        /* Unregister: Given a student id number and a course code, this function
-         * should unregister the student from that course.
-         */
-        static void unregisterStudent(Connection conn, String student, String course)
-        throws SQLException
-        {
-            PreparedStatement st = conn.prepareStatement("SELECT * FROM Registrations WHERE Student = ? AND " +
+    /* Unregister: Given a student id number and a course code, this function
+     * should unregister the student from that course.
+     */
+    static void unregisterStudent(Connection conn, String student, String course)
+    throws SQLException
+    {
+        PreparedStatement st = conn.prepareStatement("SELECT * FROM Registrations WHERE Student = ? AND " +
+            "CourseCode = ?");
+        st.setString(1,student);
+        st.setString(2,course);
+        ResultSet rs = st.executeQuery();
+        if(!rs.next())
+            System.out.println("The student " + student + " is not registered on or on a waiting list for " +
+                "the course " + course + ".");
+        else{
+            st = conn.prepareStatement("DELETE FROM Registrations WHERE Student = ? AND " +
                 "CourseCode = ?");
-            st.setString(1,student);
-            st.setString(2,course);
-            ResultSet rs = st.executeQuery();
-            if(!rs.next())
-                System.out.println("The student " + student + " is not registered on or on a waiting list for " +
-                    "the course " + course + ".");
-            else{
-                st = conn.prepareStatement("DELETE FROM Registrations WHERE Student = ? AND " +
-                    "CourseCode = ?");
-                st.setString(1,student) ;
-                st.setString(2,course) ;
-                st.executeUpdate();
-                SQLWarning warning = st.getWarnings();
-                if (warning != null){
-                    System.out.println("Warning: " + warning.getMessage());
-                } else {
-                    System.out.println("The student" + student + " is no longer registered on " + course + ".");
-                }
-                st.close();
-               
+            st.setString(1,student) ;
+            st.setString(2,course) ;
+            st.executeUpdate();
+            SQLWarning warning = st.getWarnings();
+            if (warning != null){
+                System.out.println("Warning: " + warning.getMessage());
+            } else {
+                System.out.println("The student" + student + " is no longer registered on " + course + ".");
+            }
+            st.close();
         }
     }
 }
