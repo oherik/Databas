@@ -137,7 +137,13 @@ public class StudentPortal
     static void registerStudent(Connection conn, String student, String course)
     throws SQLException
     {
-        // TODO: Your implementation here
+        PreparedStatement st =
+                conn.prepareStatement("INSERT INTO Registrations VALUES (?,?)") ;
+        st.setString(1,student) ;
+        st.setString(2,course) ;
+        st.executeUpdate() ;
+        st.close();
+        System.out.println("Student successfully registered to " + course);
     }
 
     /* Unregister: Given a student id number and a course code, this function
