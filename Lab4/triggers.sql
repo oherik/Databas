@@ -94,16 +94,16 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
     queueLength INT;
     isRegistered BOOLEAN;
   BEGIN  -- Check if the student is on the waiting list
+  	maxStudents := (SELECT RestrictedCourse.MaxStudents FROM RestrictedCourse WHERE (Code = OLD.CourseCode));
+    registredStudents := (SELECT count(Student) FROM Registrations WHERE Status = 'Registred' AND Registrations.CourseCode = OLD.CourseCode);
+    nbrSpotsLeft := (SELECT maxStudents-registredStudents);
+    queueLength := (SELECT max(QueuePos) FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode);
     IF (OLD.Status = 'Waiting')THEN
       DELETE FROM IsOnWaitingList
       WHERE (OLD.Student = Student AND OLD.CourseCode = RestrictedCourse);
     ELSE   -- Delete from course
       DELETE FROM RegisteredOn
       WHERE (OLD.Student = Student AND OLD.CourseCode = Course);  -- Check if there is room on the course
-      maxStudents := (SELECT RestrictedCourse.MaxStudents FROM RestrictedCourse WHERE (Code = OLD.CourseCode));
-      registredStudents := (SELECT count(Student) FROM Registrations WHERE Status = 'Registred' AND Registrations.CourseCode = OLD.CourseCode);
-      nbrSpotsLeft := (SELECT maxStudents-registredStudents);
-      queueLength := (SELECT max(QueuePos) FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode);
       IF(nbrSpotsLeft < 1) THEN
       	RAISE NOTICE 'No spots left on course';
       ELSEIF(registredStudents < maxStudents)THEN -- If there is someone in the queue
@@ -116,7 +116,10 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
     END IF;
     -- Update the queuePositions
 	IF(queueLength > 0) THEN
-			UPDATE IsOnWaitingList SET QueuePos = QueuePos - 1 WHERE QueuePos > 1 AND IsOnWaitingList.RestrictedCourse = OLD.CourseCode;
+			UPDATE IsOnWaitingList 
+			SET QueuePos = QueuePos - 1 
+			WHERE QueuePos > 1 
+				AND RestrictedCourse = OLD.CourseCode;
 	END IF;
     RETURN OLD;
   END;
