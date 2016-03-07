@@ -113,10 +113,11 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
           DELETE FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode);
         END IF;
       END IF;
-    END IF; -- Update the queuePositions
-    IF(queueLength > 0) THEN
-			UPDATE IsOnWaitingList SET QueuePos = QueuePos - 1 WHERE IsOnWaitingList.RestrictedCourse = OLD.CourseCode;
+    END IF; 
 	END IF;
+	-- Update the queuePositions
+	IF(queueLength > 0) THEN
+			UPDATE IsOnWaitingList SET QueuePos = QueuePos - 1 WHERE QueuePos > 0 AND IsOnWaitingList.RestrictedCourse = OLD.CourseCode;
     RETURN OLD;
   END;
 $hatarallt$ LANGUAGE plpgsql;
