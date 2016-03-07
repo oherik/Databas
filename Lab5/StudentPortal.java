@@ -80,6 +80,49 @@ public class StudentPortal
      */
     static void getInformation(Connection conn, String student) throws SQLException
     {
+        Statement st = conn.createStatement();
+
+        ResultSet rs = st.executeQuery("SELECT * FROM StudentsFollowing WHERE NationalID = '" + student + "'");
+        while(rs.next()){
+            System.out.println("Name:\t\t" + rs.getString("Name"));
+            System.out.println("National ID:\t" + rs.getString("NationalID"));
+            System.out.println("School ID:\t" + rs.getString("SchoolID"));
+            System.out.println("Programme:\t" + rs.getString("Programme"));
+            String branch = rs.getString("Branch");
+            if(branch != null && !branch.equals(""))
+                System.out.println("Branch:\t" + branch);
+        }
+        rs.close();
+
+        rs = st.executeQuery("SELECT * FROM FinishedCourses WHERE Student ='" + student + "'");
+        System.out.println("\nRead courses (name (code), credits: grade)");
+        while(rs.next()){
+            System.out.println(" " + rs.getString("CourseName") + " (" + rs.getString("CourseCode") + "), " +
+            rs.getString("Credit") +"p: "+ rs.getString("Grade"));
+        }
+        rs.close();
+
+        rs = st.executeQuery("SELECT * FROM Registrations WHERE Student = '" + student + "'");
+        System.out.println("\nRegistered courses (name (code): status):");
+        while(rs.next()){
+            String status =  rs.getString("Status");
+            String courseCode = rs.getString("CourseCode");
+            System.out.print(" " + rs.getString("CourseName") + " (" + courseCode + "): " + 
+                status);
+            if(status.equals("Waiting")){
+                //Our "CourseQueuePosition is called IsOnWaitingList"
+                ResultSet waiting = st.executeQuery("SELECT QueuePos FROM IsOnWaitingList WHERE Student = '" + student + "' AND "+
+                    "RestrictedCourse = '" +courseCode + "'");
+                while(waiting.next())
+                    System.out.print(" as nr " + waiting.getString(1));
+                waiting.close();
+            }
+            System.out.print("\n");
+        }
+        rs.close();
+
+        st.close();
+
         // TODO: Your implementation here
     }
 
