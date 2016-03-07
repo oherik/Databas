@@ -80,7 +80,41 @@ public class StudentPortal
      */
     static void getInformation(Connection conn, String student) throws SQLException
     {
-        // TODO: Your implementation here
+        System.out.println("Information for student " + student);
+        System.out.println("------------------------------------");
+        Statement st = conn.createStatement(); // start new statement *
+        ResultSet rs = // get the query results *
+        st.executeQuery("SELECT * FROM StudentsFollowing WHERE NationalID = '" + student + "'") ;
+
+        while (rs.next()) { // loop through all results *
+            System.out.println("Name: " +rs.getString(3));
+            System.out.println("StudentID: " +rs.getString(2));
+            System.out.println("Line: " + rs.getString(4));
+            System.out.println("Branch: " +rs.getString(5));
+            System.out.println("");
+
+        }
+        rs.close(); // get ready for new query *
+        System.out.println("Read courses (name (code), credits: grade):");
+        rs = st.executeQuery("SELECT * FROM FinishedCourses WHERE Student = '" + student + "'") ;
+
+        while (rs.next()) { // loop through all results *
+            System.out.println(" " +rs.getString(3) + " (" + rs.getString(2) + "), " + rs.getString(5) + "p: " + rs.getString(4) );
+        }
+        rs.close(); // get ready for new query *
+        System.out.println("");
+        System.out.println("Registered courses (name (code): status):");
+        rs = st.executeQuery("SELECT * FROM Registrations FULL JOIN IsOnWaitingList ON Registrations.Student = IsOnWaitingList.Student AND Registrations.CourseCode = IsOnWaitingList.RestrictedCourse WHERE Registrations.Student = '" + student + "'");
+
+        while (rs.next()) { // loop through all results *
+            if(rs.getString(4).equals("Waiting")){
+                System.out.println(" " +rs.getString(3) + " (" + rs.getString(2) + "): " + rs.getString(4) + " as nr " + rs.getString(7) );
+            } else{
+                System.out.println(" " +rs.getString(3) + " (" + rs.getString(2) + "): " + rs.getString(4));
+            }
+        }
+        rs.close(); // get ready for new query *
+        st.close(); // get ready for new statement *
     }
 
     /* Register: Given a student id number and a course code, this function
