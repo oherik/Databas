@@ -114,6 +114,18 @@ public class StudentPortal
             }
         }
         rs.close(); // get ready for new query *
+        System.out.println("");
+        rs = st.executeQuery("SELECT * FROM PathToGraduation WHERE Student = '" + student + "'");
+
+        while (rs.next()) { // loop through all results *
+            System.out.println("Seminar courses taken: " + rs.getString(6));
+            System.out.println("Math credits taken: " + rs.getString(4));
+            System.out.println("Research credits taken: " + rs.getString(5));
+            System.out.println("Total credits taken: " + rs.getString(2));
+            System.out.println("Fulfills the requirements for graduation: " + rs.getString(8));
+        }
+        rs.close(); // get ready for new query *
+        System.out.println("------------------------------------");
         st.close(); // get ready for new statement *
     }
 
