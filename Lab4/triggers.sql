@@ -18,33 +18,33 @@ ON      RegisteredOn.Course = Course.Code;
 
 CREATE FUNCTION register() RETURNS trigger as $register$
 DECLARE queueLength INT;
-DECLARE isWaiting BOOLEAN;
-DECLARE isRegistered BOOLEAN;
-DECLARE hasPassed BOOLEAN;
-DECLARE hasReadPrerequisites BOOLEAN;
-DECLARE maxStudents  INT;
-DECLARE registeredStudents INT;
-DECLARE nbrSpotsLeft INT;
+isWaiting BOOLEAN;
+isRegistered BOOLEAN;
+hasPassed BOOLEAN;
+hasReadPrerequisites BOOLEAN;
+maxStudents  INT;
+registeredStudents INT;
+nbrSpotsLeft INT;
 BEGIN
-		maxStudents := (SELECT RestrictedCourse.MaxStudents FROM RestrictedCourse 			
+		maxStudents := (SELECT RestrictedCourse.MaxStudents FROM RestrictedCourse
 			WHERE (Code = NEW.CourseCode));
-      	registeredStudents := (SELECT count(Student) FROM Registrations       		
-      		WHERE Status = 'Registered' AND Registrations.CourseCode = NEW.CourseCode);      	
+      	registeredStudents := (SELECT count(Student) FROM Registrations
+      		WHERE Status = 'Registred' AND Registrations.CourseCode = NEW.CourseCode);
       	nbrSpotsLeft := (SELECT maxStudents-registeredStudents);
-		queueLength := (SELECT COALESCE(MAX(QueuePos),0) FROM IsOnWaitingList 			
-			WHERE NEW.CourseCode = IsOnWaitingList.RestrictedCourse);	
+		queueLength := (SELECT COALESCE(MAX(QueuePos),0) FROM IsOnWaitingList
+			WHERE NEW.CourseCode = IsOnWaitingList.RestrictedCourse);
 
-		isWaiting := (SELECT EXISTS(SELECT 1 FROM IsOnWaitingList WHERE				
+		isWaiting := (SELECT EXISTS(SELECT 1 FROM IsOnWaitingList WHERE
 			NEW.Student = IsOnWaitingList.Student AND NEW.CourseCode = IsOnWaitingList.RestrictedCourse));
-		isRegistered := (SELECT EXISTS(SELECT 1 FROM RegisteredOn WHERE				
+		isRegistered := (SELECT EXISTS(SELECT 1 FROM RegisteredOn WHERE
 			NEW.Student = RegisteredOn.Student AND NEW.CourseCode = RegisteredOn.Course));
-		hasPassed := (SELECT EXISTS(SELECT 1 FROM HasFinished WHERE			
+		hasPassed := (SELECT EXISTS(SELECT 1 FROM HasFinished WHERE
 			NEW.Student = HasFinished.Student AND NEW.CourseCode = HasFinished.Course));
-		hasReadPrerequisites := (SELECT COALESCE((SELECT false FROM		
+		hasReadPrerequisites := (SELECT COALESCE((SELECT false FROM
 			(SELECT RequiredCourse as Course FROM Prerequisite WHERE Prerequisite.Course = NEW.CourseCode
 		EXCEPT
-		SELECT Course FROM HasFinished WHERE HasFinished.Student = NEW.Student) as CoursesLeft		
-			WHERE CoursesLeft.Course IS NOT NULL LIMIT 1), true));	
+		SELECT Course FROM HasFinished WHERE HasFinished.Student = NEW.Student) as CoursesLeft
+			WHERE CoursesLeft.Course IS NOT NULL LIMIT 1), true));
 
 		IF isRegistered THEN
 			RAISE NOTICE 'The student % is already registered on the course %.', NEW.Student, NEW.CourseCode;
@@ -57,10 +57,10 @@ BEGIN
 				NEW.Student, NEW.CourseCode;
 		ELSE-- Add the student to the appropriate table
 			IF queueLength > 0 OR nbrSpotsLeft < 1 THEN
-				INSERT INTO IsOnWaitingList(Student, RestrictedCourse, QueuePos)					
+				INSERT INTO IsOnWaitingList(Student, RestrictedCourse, QueuePos)
 				VALUES(NEW.Student, NEW.CourseCode, queueLength+1);
 			ELSE
-				INSERT INTO RegisteredOn(Student, Course) 					
+				INSERT INTO RegisteredOn(Student, Course)
 					VALUES(NEW.Student, NEW.CourseCode);
 			END IF;
 		END IF;
@@ -116,7 +116,7 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
     END IF;
     -- Update the queuePositions
 	IF(queueLength > 0) THEN
-			UPDATE IsOnWaitingList SET QueuePos = QueuePos - 1 WHERE QueuePos > 0 AND IsOnWaitingList.RestrictedCourse = OLD.CourseCode; 
+			UPDATE IsOnWaitingList SET QueuePos = QueuePos - 1 WHERE QueuePos > 1 AND IsOnWaitingList.RestrictedCourse = OLD.CourseCode;
 	END IF;
     RETURN OLD;
   END;
