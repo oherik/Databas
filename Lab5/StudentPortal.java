@@ -174,9 +174,11 @@ public class StudentPortal
                 SQLWarning warning = st.getWarnings();
                 if (warning != null){
                     System.out.println("Warning: " + warning.getMessage());
+                } else {
+                    System.out.println("The student" + student + " is no longer registered on " + course + ".");
                 }
                 st.close();
-                System.out.println("The student" + student + " is no longer registered on " + course + ".");
+               
         }
     }
 }
