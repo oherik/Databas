@@ -83,7 +83,7 @@ public class StudentPortal
         System.out.println("Information for student " + student);
         System.out.println("------------------------------------");
         Statement st = conn.createStatement(); // start new statement *
-        ResultSet rs = // get the query results *
+        ResultSet rs = // get the query results 
         st.executeQuery("SELECT * FROM StudentsFollowing WHERE NationalID = '" + student + "'") ;
 
         while (rs.next()) { // loop through all results *
@@ -146,6 +146,9 @@ public class StudentPortal
     static void unregisterStudent(Connection conn, String student, String course)
     throws SQLException
     {
-        // TODO: Your implementation here
+        Statement st = conn.createStatement();
+        st.executeQuery("DELETE FROM Registrations WHERE Student = '" + student + "' AND " +
+            "CourseCode = '" + course + "'");
+        st.close();
     }
 }
