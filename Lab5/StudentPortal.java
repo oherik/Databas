@@ -142,8 +142,13 @@ public class StudentPortal
         st.setString(1,student) ;
         st.setString(2,course) ;
         st.executeUpdate() ;
+        if(st.getWarnings() != null){
+            System.out.println(st.getWarnings());
+        } else {
+            System.out.println("Student sucessfully registered to " + course);
+        }
+
         st.close();
-        System.out.println("Student successfully registered to " + course);
     }
 
         /* Unregister: Given a student id number and a course code, this function
