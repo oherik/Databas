@@ -103,6 +103,13 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
       queuePosition := (SELECT QueuePos FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode AND Student = Old.Student);
       DELETE FROM IsOnWaitingList
       	WHERE (OLD.Student = Student AND OLD.CourseCode = RestrictedCourse);
+      queueLength := (SELECT max(QueuePos) FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode);
+	  IF(queueLength > 0) THEN
+			UPDATE IsOnWaitingList 
+			SET QueuePos = QueuePos - 1 
+			WHERE QueuePos > queuePosition 
+				AND RestrictedCourse = OLD.CourseCode;
+	  END IF;
     ELSE   -- Delete from course
       queuePosition := 0;
       DELETE FROM RegisteredOn
@@ -114,16 +121,14 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
           INSERT INTO RegisteredOn
             VALUES ((SELECT Student FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode)), OLD.CourseCode); -- Remove it from waiting list
           DELETE FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode);
+          UPDATE IsOnWaitingList 
+			SET QueuePos = QueuePos - 1 
+			WHERE QueuePos > 0 
+				AND RestrictedCourse = OLD.CourseCode;
+
         END IF;
       END IF;
     END IF;
-    -- Update the queuePositions
-	IF(queueLength > 0) THEN
-			UPDATE IsOnWaitingList 
-			SET QueuePos = QueuePos - 1 
-			WHERE QueuePos > queuePosition 
-				AND RestrictedCourse = OLD.CourseCode;
-	END IF;
     RETURN OLD;
   END;
 $hatarallt$ LANGUAGE plpgsql;
