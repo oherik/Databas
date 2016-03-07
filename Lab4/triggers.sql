@@ -1,4 +1,4 @@
-/*
+	/*
 CREATE VIEW Registrations AS
 SELECT  Student,
         Code AS CourseCode,
@@ -22,8 +22,16 @@ DECLARE isWaiting BOOLEAN;
 DECLARE isRegistered BOOLEAN;
 DECLARE hasPassed BOOLEAN;
 DECLARE hasReadPrerequisites BOOLEAN;
+DECLARE maxStudents  INT;
+DECLARE registeredStudents INT;
+DECLARE nbrSpotsLeft INT;
 
 	BEGIN
+		maxStudents := (SELECT RestrictedCourse.MaxStudents FROM RestrictedCourse 
+			WHERE (Code = OLD.CourseCode));
+      	registredStudents := (SELECT count(Student) FROM Registrations 
+      		WHERE Status = 'Registred' AND Registrations.CourseCode = OLD.CourseCode);
+      	nbrSpotsLeft := (SELECT maxStudents-registredStudents);
 		queueLength := (SELECT MAX(QueuePos) FROM IsOnWaitingList 
 			WHERE NEW.CourseCode = IsOnWaitingList.RestrictedCourse);	
 		
@@ -53,7 +61,7 @@ DECLARE hasReadPrerequisites BOOLEAN;
 				NEW.Student, NEW.CourseCode;
 		ELSE
 		-- Add the student to the appropriate table
-			IF queueLength > 0 THEN
+			IF queueLength > 0 OR nbrSpotsLeft < 1 THEN
 				INSERT INTO IsOnWaitingList(Student, RestrictedCourse, QueuePos) 
 					VALUES(NEW.Student, NEW.CourseCode, queueLength+1);
 			ELSE
