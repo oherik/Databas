@@ -53,7 +53,6 @@ $register$ LANGUAGE plpgsql;
 CREATE TRIGGER register INSTEAD OF INSERT ON Registrations
 	FOR EACH ROW EXECUTE PROCEDURE register();
 
-*/
 CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
   DECLARE nbrSpotsLeft INT;
     maxStudents INT;
