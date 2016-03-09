@@ -10,6 +10,7 @@ INSERT INTO Registrations VALUES('851007-9091', 'TDA383');
 
 
 -- TESTCASES
+/*
 
 -- 1.
 \echo '------------------------------------------ \n Test 1: List info for a student \n'
@@ -78,3 +79,4 @@ SELECT * FROM Registrations WHERE CourseCode = 'MDA2687';
 DELETE FROM Registrations WHERE Student = '520215-3895' AND CourseCode = 'MDA2687';
 \echo '\nShould still be one student waiting but only five registered.\n'
 SELECT * FROM Registrations WHERE CourseCode = 'MDA2687';
+*/
