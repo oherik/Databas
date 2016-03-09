@@ -39,7 +39,7 @@ BEGIN
 				NEW.Student, NEW.CourseCode;
 		ELSE-- Add the student to the appropriate table
 			IF queueLength > 0 OR nbrSpotsLeft < 1 THEN
-				INSERT INTO CourseQueuePositions(Student, Course, QueuePos)
+				INSERT INTO IsOnWaitingList(Student, RestrictedCourse, QueuePos)
 				VALUES(NEW.Student, NEW.CourseCode, queueLength+1);
 			ELSE
 				INSERT INTO RegisteredOn(Student, Course)
