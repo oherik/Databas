@@ -53,7 +53,7 @@ $register$ LANGUAGE plpgsql;
 CREATE TRIGGER register INSTEAD OF INSERT ON Registrations
 	FOR EACH ROW EXECUTE PROCEDURE register();
 
-CREATE OR REPLACE FUNCTION unregister_check() RETURNS TRIGGER AS $$
+CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $$
   DECLARE nbrSpotsLeft INT;
     maxStudents INT;
     registredStudents INT;
@@ -71,10 +71,10 @@ CREATE OR REPLACE FUNCTION unregister_check() RETURNS TRIGGER AS $$
       	WHERE (OLD.Student = Student AND OLD.CourseCode = RestrictedCourse);
       queueLength := (SELECT max(QueuePos) FROM CourseQueuePositions WHERE Course = Old.CourseCode);
 	  IF(queueLength > 0) THEN
-			UPDATE CourseQueuePositions
+			UPDATE IsOnWaitingList
 			SET QueuePos = QueuePos - 1
 			WHERE QueuePos > queuePosition
-				AND Course = OLD.CourseCode;
+				AND RestrictedCourse = OLD.CourseCode;
 	  END IF;
     ELSE   -- Delete from course
       queuePosition := 0;
@@ -89,11 +89,11 @@ CREATE OR REPLACE FUNCTION unregister_check() RETURNS TRIGGER AS $$
         IF(queueLength > 0) THEN
           INSERT INTO RegisteredOn
             VALUES ((SELECT Student FROM CourseQueuePositions WHERE (QueuePos = 1 AND Course = OLD.CourseCode)), OLD.CourseCode); -- Remove it from waiting list
-          DELETE FROM CourseQueuePositions WHERE (QueuePos = 1 AND Course = OLD.CourseCode);
-          UPDATE CourseQueuePositions
+          DELETE FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode);
+          UPDATE IsOnWaitingList
 			SET QueuePos = QueuePos - 1
 			WHERE QueuePos > 0
-				AND Course = OLD.CourseCode;
+				AND RestrictedCourse = OLD.CourseCode;
         END IF;
       END IF;
     END IF;
