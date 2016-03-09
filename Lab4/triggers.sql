@@ -53,7 +53,7 @@ $register$ LANGUAGE plpgsql;
 CREATE TRIGGER register INSTEAD OF INSERT ON Registrations
 	FOR EACH ROW EXECUTE PROCEDURE register();
 
-CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
+CREATE OR REPLACE FUNCTION unregister_check() RETURNS TRIGGER AS $$
   DECLARE nbrSpotsLeft INT;
     maxStudents INT;
     registredStudents INT;
@@ -67,8 +67,8 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
     queueLength := (SELECT max(QueuePos) FROM CourseQueuePositions WHERE Course = Old.CourseCode);
     IF (OLD.Status = 'Waiting')THEN
       queuePosition := (SELECT QueuePos FROM CourseQueuePositions WHERE Course = Old.CourseCode AND Student = Old.Student);
-      DELETE FROM CourseQueuePositions
-      	WHERE (OLD.Student = Student AND OLD.CourseCode = Course);
+      DELETE FROM IsOnWaitingList
+      	WHERE (OLD.Student = Student AND OLD.CourseCode = RestrictedCourse);
       queueLength := (SELECT max(QueuePos) FROM CourseQueuePositions WHERE Course = Old.CourseCode);
 	  IF(queueLength > 0) THEN
 			UPDATE CourseQueuePositions
@@ -99,7 +99,7 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
     END IF;
     RETURN OLD;
   END;
-$hatarallt$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER unregister_check INSTEAD OF DELETE ON Registrations
   FOR EACH ROW
