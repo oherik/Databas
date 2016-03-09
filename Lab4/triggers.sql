@@ -1,21 +1,3 @@
-	/*
-CREATE VIEW Registrations AS
-SELECT  Student,
-        Code AS CourseCode,
-        Name AS CourseName,
-        'Waiting' AS Status
-FROM    IsOnWaitingList JOIN Course
-ON      IsOnWaitingList.RestrictedCourse = Course.Code
-UNION
-SELECT  Student,
-        Code AS CourseCode,
-        Name AS CourseName,
-        'Registered' AS Status
-FROM    RegisteredOn JOIN Course
-ON      RegisteredOn.Course = Course.Code;
-
-*/
-
 CREATE FUNCTION register() RETURNS trigger as $register$
 DECLARE queueLength INT;
 isWaiting BOOLEAN;
@@ -31,11 +13,11 @@ BEGIN
       	registeredStudents := (SELECT count(Student) FROM Registrations
       		WHERE Status = 'Registred' AND Registrations.CourseCode = NEW.CourseCode);
       	nbrSpotsLeft := (SELECT maxStudents-registeredStudents);
-		queueLength := (SELECT COALESCE(MAX(QueuePos),0) FROM IsOnWaitingList
-			WHERE NEW.CourseCode = IsOnWaitingList.RestrictedCourse);
+		queueLength := (SELECT COALESCE(MAX(QueuePos),0) FROM CourseQueuePositions
+			WHERE NEW.CourseCode = CourseQueuePositions.Course);
 
-		isWaiting := (SELECT EXISTS(SELECT 1 FROM IsOnWaitingList WHERE
-			NEW.Student = IsOnWaitingList.Student AND NEW.CourseCode = IsOnWaitingList.RestrictedCourse));
+		isWaiting := (SELECT EXISTS(SELECT 1 FROM CourseQueuePositions WHERE
+			NEW.Student = CourseQueuePositions.Student AND NEW.CourseCode = CourseQueuePositions.Course));
 		isRegistered := (SELECT EXISTS(SELECT 1 FROM RegisteredOn WHERE
 			NEW.Student = RegisteredOn.Student AND NEW.CourseCode = RegisteredOn.Course));
 		hasPassed := (SELECT EXISTS(SELECT 1 FROM HasFinished WHERE
@@ -57,7 +39,7 @@ BEGIN
 				NEW.Student, NEW.CourseCode;
 		ELSE-- Add the student to the appropriate table
 			IF queueLength > 0 OR nbrSpotsLeft < 1 THEN
-				INSERT INTO IsOnWaitingList(Student, RestrictedCourse, QueuePos)
+				INSERT INTO CourseQueuePositions(Student, Course, QueuePos)
 				VALUES(NEW.Student, NEW.CourseCode, queueLength+1);
 			ELSE
 				INSERT INTO RegisteredOn(Student, Course)
@@ -71,21 +53,6 @@ $register$ LANGUAGE plpgsql;
 CREATE TRIGGER register INSTEAD OF INSERT ON Registrations
 	FOR EACH ROW EXECUTE PROCEDURE register();
 
-/*
-when a student tries to register for a course that is full, that student is added to the waiting list for the course.
-Be sure to check that the student may actually register for the course before adding to either list, if it may not you
-should raise an error (use RAISE EXCEPTION). Hint: There are several requirements for registration stated in the domain
-description, and some implicit ones like that a student can not be both waiting and registered for the same course at the same time.
-
-when a student unregisters from a course if the student was properly registered and not only on the waiting list, the
-first student (if any) in the waiting list should be registered for the course instead. Note: this should only be done
-if there is actually room on the course (the course might have been over-full due to an administrator overriding the
-restriction and adding students directly).
-
-You need to write the triggers on the view Registrations instead of on the tables themselves (third bullet under task 3 above).
-(One reason for this is that we “pretend” that you only have the privileges listed under Task 4, which means you cannot insert
-data into, or delete data from, the underlying tables directly. But even if we lift this restriction, there is another reason
-for not defining these triggers on the underlying tables - can you figure out why?)
 */
 CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
   DECLARE nbrSpotsLeft INT;
@@ -98,17 +65,17 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
 					maxStudents := (SELECT RestrictedCourse.MaxStudents FROM RestrictedCourse WHERE (Code = OLD.CourseCode));
     	registredStudents := (SELECT count(Student) FROM Registrations WHERE Status = 'Registred' AND Registrations.CourseCode = OLD.CourseCode);
     	nbrSpotsLeft := (SELECT maxStudents-registredStudents);
-    queueLength := (SELECT max(QueuePos) FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode);
+    queueLength := (SELECT max(QueuePos) FROM CourseQueuePositions WHERE Course = Old.CourseCode);
     IF (OLD.Status = 'Waiting')THEN
-      queuePosition := (SELECT QueuePos FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode AND Student = Old.Student);
-      DELETE FROM IsOnWaitingList
-      	WHERE (OLD.Student = Student AND OLD.CourseCode = RestrictedCourse);
-      queueLength := (SELECT max(QueuePos) FROM IsOnWaitingList WHERE RestrictedCourse = Old.CourseCode);
+      queuePosition := (SELECT QueuePos FROM CourseQueuePositions WHERE Course = Old.CourseCode AND Student = Old.Student);
+      DELETE FROM CourseQueuePositions
+      	WHERE (OLD.Student = Student AND OLD.CourseCode = Course);
+      queueLength := (SELECT max(QueuePos) FROM CourseQueuePositions WHERE Course = Old.CourseCode);
 	  IF(queueLength > 0) THEN
-			UPDATE IsOnWaitingList
+			UPDATE CourseQueuePositions
 			SET QueuePos = QueuePos - 1
 			WHERE QueuePos > queuePosition
-				AND RestrictedCourse = OLD.CourseCode;
+				AND Course = OLD.CourseCode;
 	  END IF;
     ELSE   -- Delete from course
       queuePosition := 0;
@@ -122,13 +89,12 @@ CREATE FUNCTION unregister_check() RETURNS TRIGGER AS $hatarallt$
       ELSEIF(registredStudents < maxStudents)THEN -- If there is someone in the queue
         IF(queueLength > 0) THEN
           INSERT INTO RegisteredOn
-            VALUES ((SELECT Student FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode)), OLD.CourseCode); -- Remove it from waiting list
-          DELETE FROM IsOnWaitingList WHERE (QueuePos = 1 AND RestrictedCourse = OLD.CourseCode);
-          UPDATE IsOnWaitingList
+            VALUES ((SELECT Student FROM CourseQueuePositions WHERE (QueuePos = 1 AND Course = OLD.CourseCode)), OLD.CourseCode); -- Remove it from waiting list
+          DELETE FROM CourseQueuePositions WHERE (QueuePos = 1 AND Course = OLD.CourseCode);
+          UPDATE CourseQueuePositions
 			SET QueuePos = QueuePos - 1
 			WHERE QueuePos > 0
-				AND RestrictedCourse = OLD.CourseCode;
-
+				AND Course = OLD.CourseCode;
         END IF;
       END IF;
     END IF;
@@ -139,12 +105,3 @@ $hatarallt$ LANGUAGE plpgsql;
 CREATE TRIGGER unregister_check INSTEAD OF DELETE ON Registrations
   FOR EACH ROW
   EXECUTE PROCEDURE unregister_check();
-
-/*
-when a student unregisters from a course if the student was properly
-registered and not only on the waiting list, the first student (if any)
-in the waiting list should be registered for the course instead.
-Note: this should only be done if there is actually room on the course
-(the course might have been over-full due to an administrator overriding
-the restriction and adding students directly).
- */
