@@ -152,7 +152,7 @@ VALUES
 -- Good values:
 ('520215-3895','janjan','Jan Jansson','Nano-biotechnology'),
 ('821103-7265','helbir','Helga Birgitsdotter','Political Science'),
-('560216-2579','quaank','Quarl Anka','Electrical Engineering'),
+('560216-2579','rikhjo','Rikard Hjort','Electrical Engineering'),
 ('720805-9605','thestu','Therese Sturesson','Applied Information Technology'),
 ('880121-5248','josulf','Josefin Ulfenborg','Political Science'),
 ('680607-8793','hamron','Hampus Rönström','Computer Science'),
