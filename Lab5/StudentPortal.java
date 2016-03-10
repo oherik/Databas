@@ -83,7 +83,7 @@ public class StudentPortal
         System.out.println("Information for student " + student);
         System.out.println("------------------------------------");
         Statement st = conn.createStatement(); // start new statement *
-        ResultSet rs = // get the query results 
+        ResultSet rs = // get the query results
         st.executeQuery("SELECT * FROM StudentsFollowing WHERE NationalID = '" + student + "'") ;
 
         while (rs.next()) { // loop through all results *
@@ -106,7 +106,7 @@ public class StudentPortal
         rs.close(); // get ready for new query *
         System.out.println("");
         System.out.println("Registered courses (name (code): status):");
-        rs = st.executeQuery("SELECT * FROM Registrations FULL JOIN IsOnWaitingList ON Registrations.Student = IsOnWaitingList.Student AND Registrations.CourseCode = IsOnWaitingList.RestrictedCourse WHERE Registrations.Student = '" + student + "'");
+        rs = st.executeQuery("SELECT * FROM Registrations FULL JOIN CourseQueuePositions ON Registrations.Student = CourseQueuePositions.Student AND Registrations.CourseCode = CourseQueuePositions.Course WHERE Registrations.Student = '" + student + "'");
 
         while (rs.next()) { // loop through all results *
             if(rs.getString(4).equals("Waiting")){
